@@ -8,7 +8,7 @@ var properties = require('./config/properties');
 var db = require('./config/database');
 const routes = require('./routes/index')
 var passport = require('passport');
-// var apiRoutes = require('./config/api.routes');
+var errorHandle = require('./middleware/errorHandle')
 var session = require('express-session')
 require('./passport/pass')
 var app = express();
@@ -48,10 +48,12 @@ router.post(
     });
   }
 );
-routes(app);
+
 app.use(passport.initialize());
 app.use(passport.session());
 
+routes(app);
+app.use(errorHandle);
 app.listen(properties.PORT, (req, res) => {
   console.log(`Server is running on ${properties.PORT} port.`);
 })

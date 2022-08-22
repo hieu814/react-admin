@@ -4,7 +4,7 @@ const examSchema = new mongoose.Schema({
 	users: { type: mongoose.Schema.Types.ObjectId, trim: true, ref: 'users' },
 	name: { type: String, required: true, trim: true },
 	description: { type: String, trim: true },
-	groupquestions: [{ type: mongoose.Schema.Types.ObjectId, trim: true, ref: 'group-questions' }],
+	parts: [{ type: mongoose.Schema.Types.ObjectId, trim: true, ref: 'parts' }],
 },{ timestamps: true }
 )
 

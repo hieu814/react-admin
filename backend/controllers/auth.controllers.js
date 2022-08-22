@@ -1,6 +1,6 @@
 const Users = require('../models/users.model')
 const passport = require('passport');
-const createError = require('../utils/ErrorRes')
+const MyError = require('../utils/MyError')
 exports.login = async (req, res, next) => {
 	passport.authenticate(
 		'login',
@@ -30,19 +30,19 @@ exports.login = async (req, res, next) => {
 	)(req, res, next);
 }
 exports.register = async (req, res, next) => {
-	const { name, password, email, phone, gender, date, grades } = req.body
+	const { username, password, email, phone, gender, date } = req.body
 
 	try {
 		const user = await Users.findOne({ email });
 
 		if (user) {
-			const err = createError(400, "Email exists");
+			const err = MyError( "Email exists");
 			
 
 			return next (JSON.stringify(err, Object.getOwnPropertyNames(err)));
 		} else {
 			user = await Users.create({
-				name,
+				username,
 				password,
 				email,
 				phone,
@@ -51,7 +51,6 @@ exports.register = async (req, res, next) => {
 				grades,
 			})
 		}
-		//return createError(400, "Server Error")
 
 
 		res.status(200).json(user)
@@ -60,5 +59,22 @@ exports.register = async (req, res, next) => {
 	}
 }
 exports.profile = async (req, res, next) => {
-	return res.status(200).json("adasdasd")
+	console.log("profile")
+	try {
+		const user = await Users.findById(req.user)
+		res.send(user).status(200)
+	} catch (error) {
+		next(error)
+	}
+}
+exports.verifyUser = async (req, res, next) => {
+	
+	try {
+		const { id } = req.user
+		const user = await Users.findById(req.user)
+		console.log("resUser: ",user)
+		res.send(user).status(200)
+	} catch (error) {
+		next(error)
+	}
 }

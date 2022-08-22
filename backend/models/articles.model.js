@@ -4,7 +4,7 @@ const articleSchema = new mongoose.Schema(
 	{
 		name: { type: String , trim: true },
         thumbail: { type: String , trim: true },
-		content: [{ type: mongoose.Schema.Types.ObjectId, trim: true, ref: 'passages' }],
+		content:  { type: String , trim: true },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'users',
@@ -13,6 +13,11 @@ const articleSchema = new mongoose.Schema(
         updatedBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'users',
+            default: null
+        },
+        category: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'article_categories',
             default: null
         }
 	},

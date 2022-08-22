@@ -3,10 +3,9 @@ const brypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const validator = require('validator')
-const createError = require('../utils/ErrorRes')
+const MyError = require('../utils/MyError')
 
 const usersSchema = new mongoose.Schema({
-	// grades: { type: mongoose.Schema.Types.ObjectId, trim: true, required: true, ref: 'grades' },
 	name: { type: String, trim: true },
 	email: {
 		type: String,
@@ -15,18 +14,18 @@ const usersSchema = new mongoose.Schema({
 		trim: true,
 		validate(value) {
 			if (!validator.isEmail(value)) {
-				throw createError(400,'Email không hợp lệ!')
+				throw MyError( 'Email không hợp lệ!')
 			}
 		},
 	},
 	password: {
 		type: String,
 		required: true,
-		select: true,
+		select: false,
 		trim: true,
 		validate(value) {
 			if (!validator.matches(value, /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)|(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)) {
-				throw createError(400,'mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 là số, hoặc 1 ký tự đặc biệt'
+				throw MyError('Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 là số, hoặc 1 ký tự đặc biệt'
 				)
 			}
 		},
@@ -34,7 +33,11 @@ const usersSchema = new mongoose.Schema({
 	phone: { type: String, trim: true },
 	gender: { type: Number, default: 1 },
 	date: { type: String, trim: true },
-	role: { type: Number, default: 1 },
+	role: {
+		type: String,
+		enum: ['USER', 'EDITOR','ADMIN'],
+		default: 'USER'
+	},
 	resetPasswordToken: String,
 	refreshToken: String,
 })
@@ -48,11 +51,11 @@ usersSchema.pre('save', async function (next) {
 })
 
 usersSchema.methods.matchPassword = async function (password) {
-	return await brypt.compare(password,this.password)
+	return await brypt.compare(password, this.password)
 }
 
 usersSchema.methods.getSignedToken = function () {
-	return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, { expiresIn: '12h' })
+	return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, { expiresIn: '48h' })
 }
 
 usersSchema.methods.getResetPasswordToken = async function () {

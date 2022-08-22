@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var authController = require('../../controllers/auth');
+var authController = require('../../controllers/auth.controllers');
 var passport = require('passport');
 //Middle ware that is specific to this router
 router.use(function timeLog(req, res, next) {
