@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
-var controller = require('../../controllers/category.controllers');
+var controller = require('../../controllers/articleCategory.controllers');
 var passport = require('passport');
 
 router.get('/getAll', controller.getAll);
 router.get('/:id', controller.getOne);
 router.patch('/:id', controller.update);
 router.delete('/:id', controller.delete);
-router.post('/insert', controller.insert);
+router.post('', controller.insert);
 
 module.exports = router;

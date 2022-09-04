@@ -7,4 +7,4 @@ const groupSchema = new mongoose.Schema({
 },{ timestamps: true }
 )
 
-module.exports = mongoose.model('groupexams', groupSchema)
+module.exports = mongoose.model('exam_category', groupSchema)

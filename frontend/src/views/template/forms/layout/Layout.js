@@ -134,7 +134,7 @@ const Layout = () => {
                     Email
                   </CFormLabel>
                   <CCol sm={10}>
-                    <CFormInput type="email" id="inputEmail3" />
+                    <CFormInput type="email" id="inputEmail3"  />
                   </CCol>
                 </CRow>
                 <CRow className="mb-3">

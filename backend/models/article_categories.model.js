@@ -3,8 +3,8 @@ const mongoose = require('mongoose')
 const articleSchema = new mongoose.Schema(
 	{
 		name: { type: String , trim: true },
-        type: { type: Number, required: true, trim: true , default: 1},
-        articles: [{ type: mongoose.Schema.Types.ObjectId, trim: true, ref: 'articles' }],
+        type: { type: Number, trim: true , default: 1},
+    
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'users',

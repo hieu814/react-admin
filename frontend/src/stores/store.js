@@ -1,11 +1,13 @@
 import { createStore } from 'redux'
 import { configureStore } from "@reduxjs/toolkit";
 import global from "../stores/global/globalSlice"
+import exam from "../stores/exam/examSlice"
 const initialState = {
   sidebarShow: true,
 }
 const rootReducer = {
-	global
+	global,
+  exam
 
 };
 const changeState = (state = initialState, { type, ...rest }) => {

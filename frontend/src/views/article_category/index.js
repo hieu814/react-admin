@@ -12,10 +12,11 @@ import {
   CFormInput,
   CFormSelect
 } from '@coreui/react'
-import VocabularyModal from "./components/Modal/index.js";
-import vocabularyCategoryApi from "src/api/vocabularyCategoryApi";
+import ArticleModal from "./components/Modal/index.js";
+import ArticleCategoryApi from "src/api/ArticleCategoryApi";
 import { successMessage, errorMessage } from '../components/MyMessage'
-import { ShowConfirm } from '../components/ConfirmModal'
+import  MyAction  from 'src/views/components/MyAction'
+
 
 const columns = memoize(handleAction => [
   {
@@ -32,35 +33,17 @@ const columns = memoize(handleAction => [
   {
     name: '',
     button: true,
-    ignoreRowClick: true,
-    cell: (row, index, column, id) => (
-      <CButton
-        color={"primary"}
-        key={1}
-
-        onClick={() => handleAction(false, row)}
-      >
-        {"Sửa"}
-      </CButton>
-    )
-  },
-  {
-    name: '',
-    button: true,
     allowOverflow: true,
     ignoreRowClick: true,
     cell: (row, index, column, id) => (
-      <CButton
-        color={"danger"}
-        key={1}
-        onClick={() => handleAction(true, row._id)}
+      <MyAction
+      handleAction={(isDelete) => handleAction(isDelete, row)}
       >
-        Xóa
-      </CButton>
+      </MyAction>
     )
   }
 ]);
-export default function User() {
+export default function View() {
 
 
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -92,7 +75,7 @@ export default function User() {
   const fetchData = async (search) => {
 
     try {
-      let respond = await vocabularyCategoryApi.fetchData({ skip: currentPage, limit: rowPerPage, search: search});
+      let respond = await ArticleCategoryApi.fetchData({ skip: currentPage, limit: rowPerPage, search: search});
       console.log("respond: ", respond)
       setData(respond.data)
       setTotalPage(respond.paging.total)
@@ -103,9 +86,7 @@ export default function User() {
   }
   const handleSearch = (event) => {
     try {
-
       fetchData(event.target.search.value)
-
     } catch (error) {
       console.log("error: ", error)
     }
@@ -127,14 +108,12 @@ export default function User() {
   const handleEdit = (isDelete, event) => {
     if (isDelete) {
       try {
-        ShowConfirm("Bạn có chắc không?", function () {
-          vocabularyCategoryApi.delete(event);
-          successMessage("Xóa thành công");
-          fetchData();
-        })
+        ArticleCategoryApi.delete(event._id);
+        successMessage("Xóa thành công");
       } catch (error) {
         errorMessage("Xóa Thât bại");
       }
+      fetchData()
 
     } else {
       setCurrentData(event)
@@ -176,7 +155,7 @@ export default function User() {
             </CCardHeader>
             <CCardBody>
               <DataTable
-                title="Quản lý nhóm từ vựng"
+                title="Quản lý nhóm bài học"
                 columns={columns((isDelete, event) => handleEdit(isDelete, event))}
                 data={data}
                 // customStyles={customStyles}
@@ -194,11 +173,11 @@ export default function User() {
 
 
       </CRow >
-      <VocabularyModal
+      <ArticleModal
         isModalVisible={isModalVisible}
         setIsModalVisible={handleShowModal}
         onSubmit={handleSubmit}
-        vocabulary={currentData}
+        Article={currentData}
       />
     </div>
   );

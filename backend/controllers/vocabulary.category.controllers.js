@@ -87,9 +87,9 @@ exports.delete = async (req, res, next) => {
 }
 exports.insert = async (req, res, next) => {
 
-    const { name ,description } = req.body
-console.log("req.body: ",req.body)
-    if (name ) {
+    const { name, description } = req.body
+    console.log("req.body: ", req.body)
+    if (name) {
         try {
             const checkData = await vocabularyModel.findOne({ name });
 

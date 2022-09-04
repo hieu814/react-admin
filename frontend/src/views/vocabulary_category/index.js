@@ -15,7 +15,8 @@ import {
 import VocabularyModal from "./components/Modal/index.js";
 import vocabularyCategoryApi from "src/api/vocabularyCategoryApi";
 import { successMessage, errorMessage } from '../components/MyMessage'
-import { ShowConfirm } from '../components/ConfirmModal'
+import  MyAction  from 'src/views/components/MyAction'
+
 
 const columns = memoize(handleAction => [
   {
@@ -32,37 +33,17 @@ const columns = memoize(handleAction => [
   {
     name: '',
     button: true,
-    ignoreRowClick: true,
-    cell: (row, index, column, id) => (
-      <CButton
-        color={"primary"}
-        key={1}
-
-        onClick={() => handleAction(false, row)}
-      >
-        {"Sửa"}
-      </CButton>
-    )
-  },
-  {
-    name: '',
-    button: true,
     allowOverflow: true,
     ignoreRowClick: true,
     cell: (row, index, column, id) => (
-      <CButton
-        color={"danger"}
-        key={1}
-        onClick={() => handleAction(true, row._id)}
+      <MyAction
+      handleAction={(isDelete) => handleAction(isDelete, row)}
       >
-        Xóa
-      </CButton>
+      </MyAction>
     )
   }
 ]);
-export default function User() {
-
-
+export default function View() {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [data, setData] = useState([])
   const [isloading, setIsloading] = useState(false)
@@ -103,9 +84,7 @@ export default function User() {
   }
   const handleSearch = (event) => {
     try {
-
       fetchData(event.target.search.value)
-
     } catch (error) {
       console.log("error: ", error)
     }
@@ -127,14 +106,12 @@ export default function User() {
   const handleEdit = (isDelete, event) => {
     if (isDelete) {
       try {
-        ShowConfirm("Bạn có chắc không?", function () {
-          vocabularyCategoryApi.delete(event);
-          successMessage("Xóa thành công");
-          fetchData();
-        })
+        vocabularyCategoryApi.delete(event._id);
+        successMessage("Xóa thành công");
       } catch (error) {
         errorMessage("Xóa Thât bại");
       }
+      fetchData()
 
     } else {
       setCurrentData(event)

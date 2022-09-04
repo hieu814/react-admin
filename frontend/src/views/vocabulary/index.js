@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import DataTable from 'react-data-table-component';
 import memoize from 'memoize-one';
-import { ROLES } from 'src/constants/constant'
+import { Upload, Image } from "antd";
 import {
   CCard,
   CCardBody,
@@ -13,46 +13,36 @@ import {
   CFormInput,
   CFormSelect
 } from '@coreui/react'
-import UserModal from "./components/Modal/index.js";
-import UserApi from "../../api/usersApi";
+import VocabularyModal from "./components/Modal/index.js";
+import VocabularyApi from "src/api/vocabularyApi";
+import VocabularyCategoryApi from "src/api/vocabularyCategoryApi";
 import { successMessage, errorMessage } from '../components/MyMessage'
-import { ShowConfirm } from '../components/ConfirmModal'
+import MyAction from 'src/views/components/MyAction'
+
 
 const columns = memoize(handleAction => [
   {
-    name: 'id',
-    selector: row => row._id,
+    name: 'Từ',
+    selector: row => row.word,
     sortable: true
   },
   {
-    name: 'Quyền',
-    selector: row => row.role,
-    sortable: true
-  },
-  {
-    name: 'Tên',
-    selector: row => row.name,
-    sortable: true
-  },
-  {
-    name: 'Email',
-    selector: row => row.email,
-    sortable: true
-  },
-  {
-    name: '',
-    button: true,
-    ignoreRowClick: true,
+    name: 'Ảnh',
+    selector: row => row.description,
     cell: (row, index, column, id) => (
-      <CButton
-        color={"primary"}
-        key={1}
-
-        onClick={() => handleAction(false, row)}
-      >
-        {"Sửa"}
-      </CButton>
+      <Image src={row.image} width={100} height={100} />
     )
+
+  },
+  {
+    name: 'Phát âm',
+    selector: row => row.pronounce,
+    sortable: true
+  },
+  {
+    name: 'Loại từ',
+    selector: row => row.type,
+    sortable: true
   },
   {
     name: '',
@@ -60,17 +50,14 @@ const columns = memoize(handleAction => [
     allowOverflow: true,
     ignoreRowClick: true,
     cell: (row, index, column, id) => (
-      <CButton
-        color={"danger"}
-        key={1}
-        onClick={() => handleAction(true, row._id)}
+      <MyAction
+        handleAction={(isDelete) => handleAction(isDelete, row)}
       >
-        Xóa
-      </CButton>
+      </MyAction>
     )
   }
 ]);
-export default function User() {
+export default function View() {
 
 
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -79,28 +66,25 @@ export default function User() {
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPage, setTotalPage] = useState(1)
   const [rowPerPage, setRowPerPage] = useState(10)
-  const [role, setRole] = useState(undefined)
   const [currentData, setCurrentData] = useState(null)
+  const [categories, setCategories] = useState([])
+  const [categoryID, setCategoryID] = useState(null)
+  const [searchString, setSearchString] = useState(null)
 
- 
   const changeRowPerPage = async (perPage) => {
     console.log(perPage);
     setRowPerPage(perPage)
-    fetchData();
   }
-
+  const changeCategoryID = async (id) => {
+    let _id = id.target.value
+    if (_id && _id.length > 3) {
+      setCategoryID(_id)
+    } else {
+      setCategoryID(null)
+    }
+  }
   const changePage = async (page) => {
     setCurrentPage(page)
-    fetchData();
-  }
-  const changeRole = (r) => {
-    let rol = r.target.value
-    console.log("role: ", rol)
-    if (rol === ROLES.NON)
-      setRole(null)
-    else
-      setRole(rol)
-
   }
   const handleShowModal = (visible) => {
     if (!visible) {
@@ -109,10 +93,15 @@ export default function User() {
     }
     setIsModalVisible(visible)
   }
-  const fetchData = async (search) => {
+  const fetchData = async () => {
 
     try {
-      let respond = await UserApi.fetchUsers({ skip: currentPage, limit: rowPerPage, search: search, role: role });
+      if (categories.length === 0) {
+        let _category = await VocabularyCategoryApi.fetchData({ skip: 0, limit: 100 });
+        setCategories(_category.data)
+      }
+
+      let respond = await VocabularyApi.fetchData({ skip: currentPage, limit: rowPerPage, search: searchString, category: categoryID });
       console.log("respond: ", respond)
       setData(respond.data)
       setTotalPage(respond.paging.total)
@@ -123,9 +112,7 @@ export default function User() {
   }
   const handleSearch = (event) => {
     try {
-
-      fetchData(event.target.search.value)
-
+      setSearchString(event.target.search.value)
     } catch (error) {
       console.log("error: ", error)
     }
@@ -147,24 +134,24 @@ export default function User() {
   const handleEdit = (isDelete, event) => {
     if (isDelete) {
       try {
-        ShowConfirm("Bạn có chắc không?",function (){
-          UserApi.deleteUser(event);
-          successMessage("Xóa thành công");
-          fetchData();
-        })
+        VocabularyApi.delete(event._id);
+        successMessage("Xóa thành công");
       } catch (error) {
         errorMessage("Xóa Thât bại");
       }
+      fetchData()
 
     } else {
+      console.log("-----------vocabulary ",event)
       setCurrentData(event)
       handleShowModal(true)
     }
 
   }
-  useMemo(() => {
+  useEffect(() => {
+
     fetchData()
-  }, []);
+  }, [categoryID, searchString, rowPerPage, totalPage, currentPage]);
   return (
     <div>
       <CRow>
@@ -193,14 +180,14 @@ export default function User() {
                 <CCol xs={12}>
 
                   <CFormSelect
+                    name="category"
                     aria-label="Default select example"
-                    onChange={changeRole}
-                    options={[
-                      { label: 'Tất cả', value: ROLES.NON },
-                      { label: 'Người dùng', value: ROLES.USER },
-                      { label: 'Admin', value: ROLES.ADMIN },
-                      { label: 'Nhân viên', value: ROLES.EDITTOR }
-                    ]}
+                    onChange={changeCategoryID}
+                    value={categoryID}
+                    options={[{ label: "Tất cả", value: "-" }, ...categories?.map((value) => {
+                      const { _id, name } = value;
+                      return { label: name, value: _id }
+                    })]}
                   />
                 </CCol>
               </CRow>
@@ -208,10 +195,10 @@ export default function User() {
             </CCardHeader>
             <CCardBody>
               <DataTable
-                title="Quản lý tài khoản"
+                title="Quản lý từ vựng"
                 columns={columns((isDelete, event) => handleEdit(isDelete, event))}
                 data={data}
-                // customStyles={customStyles}
+                categories={categories}
                 onChangePage={(p) => changePage(p)}
                 pagination={true}
                 paginationTotalRows={totalPage}
@@ -226,11 +213,12 @@ export default function User() {
 
 
       </CRow >
-      <UserModal
+      <VocabularyModal
+        categories={categories}
         isModalVisible={isModalVisible}
         setIsModalVisible={handleShowModal}
         onSubmit={handleSubmit}
-        user={currentData}
+        vocabulary={currentData}
       />
     </div>
   );

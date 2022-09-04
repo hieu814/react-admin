@@ -3,20 +3,43 @@ var mongoose = require('mongoose');
 const MyError = require('../utils/MyError')
 exports.getAll = async (req, res, next) => {
     try {
-        const limit = req.query.limit ? parseInt(req.query.limit) : 20;
-        const offset = req.query.skip ? parseInt(req.query.skip) : 0;
-        const search = req.query.search;
+        let limit = req.query.limit ? parseInt(req.query.limit) : 20;
+        let offset = req.query.skip ? parseInt(req.query.skip) : 0;
+        let search = req.query.search;
+        let category = req.query.category;
         console.log("limit: ", limit, " offset: ", offset, "search: ", search, " body: ", req.body)
         let collections;
         let collectionCount;
-        if (search) {
-            collections = await articleModel.find({
-                $or: [
-                    {
-                        name: { '$regex': search, '$options': 'i' },
-                    }
-                ],
-            })
+        if (search || category) {
+            let querys = {}
+            if (category) {
+                if (!search)
+                    search = ""
+                querys = {
+                    $and: [
+                        {
+                            category:  mongoose.Types.ObjectId(category),
+                        },
+                        {
+                            $or: [
+                                {
+                                    name: { '$regex': search, '$options': 'i' },
+                                }
+                            ],
+                        }
+                    ]
+
+                }
+            } else {
+                querys = {
+                    $or: [
+                        {
+                            name: { '$regex': search, '$options': 'i' },
+                        }
+                    ],
+                }
+            }
+            collections = await articleModel.find(querys)
                 .skip(offset)
                 .limit(limit);
             collectionCount = await articleModel.countDocuments({
@@ -61,7 +84,7 @@ exports.getOne = async (req, res, next) => {
 exports.update = async (req, res, next) => {
     const id = req.params.id;
     const updateObject = req.body;
-    updateObject.updatedBy = mongoose.Types.ObjectId(req.user),
+    updateObject.updatedBy = req.user,
         articleModel.updateOne({ _id: id }, { $set: updateObject })
             .exec()
             .then(() => {
@@ -88,7 +111,7 @@ exports.delete = async (req, res, next) => {
 }
 exports.insert = async (req, res, next) => {
 
-    const { name, thumbail, content } = req.body
+    const { category, name, thumbail, content } = req.body
 
     if (name && thumbail && content) {
         try {
@@ -102,11 +125,12 @@ exports.insert = async (req, res, next) => {
 
             } else {
                 const data = new articleModel({
+                    category: category,
                     name: name,
                     thumbail: thumbail,
                     content: content,
-                    createdBy: mongoose.Types.ObjectId(req.user),
-                    updatedBy: mongoose.Types.ObjectId(req.user),
+                    createdBy: req.user,
+                    updatedBy: req.user,
                 })
                 await data.save();
 
@@ -120,6 +144,6 @@ exports.insert = async (req, res, next) => {
             next(error)
         }
     } else {
-        next(MyError('Xin hãy điển thêm thông tin'))
+        next(new MyError('Xin hãy điển thêm thông tin'))
     }
 }

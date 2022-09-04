@@ -1,15 +1,20 @@
-
-import { Formik } from "formik";
+import { EditOutlined, LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Col, message, Row, Space, Spin } from "antd";
 import PropTypes from "prop-types";
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from "react-redux";
 import * as Yup from "yup";
-import userApi from "../../../../api/usersApi";
-import { ROLES } from 'src/constants/constant';
-import {successMessage, errorMessage} from 'src/views/components/MyMessage';
+import VocabularyApi from "src/api/vocabularyApi";
+import { successMessage, errorMessage } from 'src/views/components/MyMessage';
 import {
-    CFormFeedback,
-    CFormLabel,
+    ImageField,
+    InputField,
+    TextAreaField,
+    UploadField,
+} from "src/views/components/customfield";
+import { FastField, Form, Formik } from "formik";
+import MyEditor from "src/views/components/MyEditor";
+import {
     CCol,
     CRow,
     CButton,
@@ -18,164 +23,224 @@ import {
     CModalFooter,
     CModalHeader,
     CModalTitle,
-    CForm,
-    CFormInput,
-    CFormSelect
+    CFormLabel,
+
 } from '@coreui/react'
-export const userValues = {
+export const schema = {
     initial: {
-        email: "",
-        name: "",
-        username: "",
-        password: "",
-        role: ""
+        word: "",
+        mean: "",
+        definition: "",
+        pronounce: "",
+        image: "",
+        audio: "",
+        type: "",
     },
 
     validationSchema: Yup.object().shape({
-        name: Yup.string().required("Tên không được bỏ trống"),
-        // username: Yup.string().required("Tài khoản không được bỏ trống"),
-        password: Yup.string().required("Mật khẩu không được bỏ trống").matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)|(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 là số, hoặc 1 ký tự đặc biệt"),
-        email: Yup.string().email("Email không hợp lệ").required("Email không được bỏ trống"),
+        word: Yup.string().required("Tên không được bỏ trống")
+
     }),
-    editValidationSchema: Yup.object().shape({
-        name: Yup.string().required("Tên không được bỏ trống"),
-        // username: Yup.string().required("Tài khoản không được bỏ trống"),
-        password: Yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)|(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 là số, hoặc 1 ký tự đặc biệt"),
-        email: Yup.string().email("Email không hợp lệ").required("Email không được bỏ trống"),
-    }),
+
 };
 
-function UserModal(props) {
+function MyModal(props) {
     const dispatch = useDispatch();
     const { isModalVisible, setIsModalVisible } = props;
-    const [errorMsg, setErrorMsg] = useState(null);
-    const [user, setUser] = useState(null);
-
+    const [errorMsg, setErrorMsg] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [categories, setCate] = useState([])
     const handleCancel = () => {
+        setErrorMsg(null)
         setIsModalVisible(false);
     };
 
     const handleSubmit = async (values, actions) => {
+        setErrorMsg(null);
+        setIsSubmitting(true);
+
         try {
-            if(props.user){
-                await userApi.updateUser(props.user._id,values)
-                successMessage("Sửa thành công.")
-            }else{
-                await userApi.addUser(values)
-                successMessage("Thêm thành công.")
+
+
+            const { _id, image } = values;
+
+            const vocabulary = { ...values };
+            delete vocabulary.image;
+
+            let response;
+
+            if (!props.vocabulary) {
+                response = await VocabularyApi.insert(vocabulary);
+            } else {
+                response = await VocabularyApi.update(_id, vocabulary);
+            }
+            // console.log("------------------ response ",response)
+            if (image && typeof image === "object") {
+                const vocabularyId = !props.vocabulary ? response.data._id : _id;
+                await VocabularyApi.updateImage(vocabularyId, image);
             }
             setErrorMsg(null);
+            if (props.vocabulary) {
+                successMessage("Sửa thành công.")
+            } else {
+                successMessage("Thêm thành công.")
+            }
             handleCancel()
+            setIsSubmitting(false);
         } catch (error) {
             const { response } = error;
             const message = response.data.message
             setErrorMsg(message);
+
         }
-
+        setIsSubmitting(false);
     };
-
+    const uploadButton = (
+        <div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
+    );
     return (
-        <CModal alignment="center" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+        <CModal size="xl" alignment="center" visible={isModalVisible} onClose={() => handleCancel()}>
             <CModalHeader>
                 <CModalTitle>Modal title</CModalTitle>
             </CModalHeader>
             <CModalBody>
-                <Formik
-                    initialValues={props.user ? props.user : userValues.initial}
-                    validationSchema={props.user ? userValues.editValidationSchema : userValues.validationSchema}
-                    onSubmit={handleSubmit}
-                >
-                    {(props) => {
-                        const { isSubmitting } = props;
-                        console.log("form value: ", props.errors)
-                        return (
+                <CRow>
 
-                            <CForm
-                                className="row g-3 needs-validation"
-                                id='my-form'
-                                validated={false}
-                                onSubmit={props.handleSubmit}
-                                noValidate
-                            >
+                    <CCol>
+                        <Formik
+                            initialValues={props.vocabulary ? props.vocabulary : schema.initial}
+                            validationSchema={schema.validationSchema}
+                            onSubmit={handleSubmit}
+                        >
+                            {(formikProps) => {
+                                const { values } = formikProps;
+                                return (
+                                    <Form id='my-form'
+                                    >
+                                        {errorMsg && (<CCol>
+                                            <h6 style={{ color: "red" }}>{errorMsg}</h6>
+                                        </CCol>)}
+                                        <Space
+                                            direction="vertical"
+                                            size="middle"
+                                            style={{ width: "100%" }}
+                                        >
+                                            <FastField component={InputField} name="id" type="hidden" />
+                                            <FastField
+                                                name="word"
+                                                component={InputField}
+                                                title="Từ vựng"
+                                                titleCol={6}
+                                                maxLength={200}
+                                                inputCol={18}
+                                                isRequire={true}
+                                            />
+                                            <FastField
+                                                name="type"
+                                                component={InputField}
+                                                title="Loại từ"
+                                                titleCol={6}
+                                                maxLength={200}
+                                                inputCol={18}
+                                                isRequire={true}
+                                            />
+                                            <FastField
+                                                name="pronounce"
+                                                component={InputField}
+                                                title="Phát âm"
+                                                titleCol={6}
+                                                maxLength={200}
+                                                inputCol={18}
+                                                isRequire={true}
+                                            />
+                                            <FastField
+                                                name="definition"
+                                                component={TextAreaField}
+                                                title="Định nghĩa"
+                                                maxLength={200}
+                                                titleCol={6}
+                                                inputCol={18}
+                                                isRequire={true}
+                                                rows={3}
+                                            />
+                                            <FastField
+                                                name="mean"
+                                                component={InputField}
+                                                title="Nghĩa tiếng Việt"
+                                                titleCol={6}
+                                                maxLength={200}
+                                                inputCol={18}
+                                                isRequire={true}
+                                            />
+                                            <FastField
+                                                name="example"
+                                                component={InputField}
+                                                title="Ví dụ"
+                                                titleCol={6}
+                                                maxLength={200}
+                                                inputCol={18}
+                                                isRequire={true}
+                                            />
+                                            <FastField
+                                                name="sound"
+                                                component={UploadField}
+                                                title="Âm thanh"
+                                                titleCol={6}
+                                                inputCol={18}
+                                                fileType="audio/*"
+                                            />
+                                            <FastField
+                                                name="image"
+                                                component={ImageField}
+                                                title="Ảnh"
+                                                titleCol={6}
+                                                inputCol={18}
+                                            />
+                                        </Space>
 
-                                {errorMsg && (<CCol>
-                                    <h6 style={{ color: "red" }}>{errorMsg}</h6>
-                                </CCol>)}
-                                <CFormInput
-                                    type="text"
-                                    name="email"
-                                    aria-describedby="validationCustom03Feedback"
-                                    feedbackInvalid={props.errors.email}
+                                    </Form>
+                                );
+                            }}
+                        </Formik>
+                    </CCol>
+                </CRow>
 
-                                    label="Email"
-                                    value={props.values.email}
-                                    onChange={props.handleChange}
-                                    required
-                                    invalid={props.errors.email}
-                                />
-                                <CFormInput
-                                    type="password"
-                                    name="password"
-                                    aria-describedby="validationCustom03Feedback"
-                                    feedbackInvalid={props.errors.password}
-
-                                    label="Password"
-                                    value={props.values.password}
-                                    onChange={props.handleChange}
-                                    required
-                                    invalid={props.errors.password}
-                                />
-                                <CFormInput
-                                    type="name"
-                                    name="name"
-                                    aria-describedby="validationCustom03Feedback"
-                                    feedbackInvalid={props.errors.name}
-
-                                    label="Username"
-                                    value={props.values.name}
-                                    onChange={props.handleChange}
-                                    required
-                                    invalid={props.errors.name}
-                                />
-                                <CCol md={3}>
-                                    <CFormLabel htmlFor="validationCustom04">Quyền</CFormLabel>
-                                    <CFormSelect name="role" value={props.values.role} onChange={props.handleChange}>
-                                        <option value={ROLES.USER}>Người dùng</option>
-                                        <option value={ROLES.EDITTOR}>Nhân viên</option>
-                                        <option value={ROLES.ADMIN}>Admin</option>
-                                    </CFormSelect>
-                                    <CFormFeedback valid={!props.errors.role}>{props.errors.role}</CFormFeedback>
-                                </CCol>
-
-
-                            </CForm>
-                        )
-                    }}
-                </Formik>
             </CModalBody>
             <CModalFooter>
-                <CButton color="secondary" onClick={() => setIsModalVisible(false)}>
+                <CButton color="secondary" onClick={() => handleCancel()}>
                     Close
                 </CButton>
-                <CButton color="primary" type="submit" form='my-form'>Save changes</CButton>
+                <CButton color="primary" type="submit" form='my-form'>
+                    {isSubmitting && (
+                        <Spin
+                            indicator={
+                                <LoadingOutlined style={{ color: "white" }} spin />
+                            }
+                        />
+                    )}
+                    Save changes
+                </CButton>
             </CModalFooter>
         </CModal>
 
     );
 }
-UserModal.propTypes = {
+MyModal.propTypes = {
     isModalVisible: PropTypes.bool,
     setIsModalVisible: PropTypes.func,
     query: PropTypes.object,
 };
 
-UserModal.defaultProps = {
+MyModal.defaultProps = {
     isModalVisible: false,
     setIsModalVisible: null,
     query: {
-        username: "",
+        vocabularyname: "",
         page: 0,
         size: 10,
     },
 };
-export default UserModal;
+export default MyModal;

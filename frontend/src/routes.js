@@ -19,9 +19,15 @@ const vocabularies = React.lazy(() => import('./views/vocabulary'))
 const vocabulary_category = React.lazy(() => import('./views/vocabulary_category'))
 
 //article
-const article = React.lazy(() => import('./views/article_category'))
+const article = React.lazy(() => import('./views/article'))
 
 const article_category = React.lazy(() => import('./views/article_category'))
+//exam 
+const exam = React.lazy(() => import('./views/Exam'))
+
+const exam_category = React.lazy(() => import('./views/exam_category'))
+const ParagraphPage = React.lazy(() => import( "./views/Exam/pages/ParagraphPage"))
+const QuestionPage = React.lazy(() =>  import("./views/Exam/pages/QuestionPage"))
 
 
 // Base
@@ -76,9 +82,14 @@ const routes = [
   { path: '/users/addUser', name: 'Add User', element: addUser },
   { path: '/users', name: 'Users', element: users },
   { path: '/vocabulary', name: 'Vocabulary', element: vocabularies },
-  { path: '/vocabulary_category', name: 'Vocabulary Category', element: article_category },
-  { path: '/article', name: 'Vocabulary', element: vocabularies },
-  { path: '/article_category', name: 'Vocabulary Category', element: article_category },
+  { path: '/vocabulary_category', name: 'Vocabulary Category', element: vocabulary_category },
+  { path: '/article', name: 'Vocabulary', element: article },
+  { path: '/article_category', name: 'Article Category', element: article_category },
+  { path: '/exams/*', name: 'Exam', element: exam },
+  // { path: '/exams_category', name: 'Exam Category', element: exam_category },
+  // { path: '/exams/questions', name: 'questions', element: QuestionPage },
+  // { path: '/exams/paragraphs', name: 'paragraphs', element: ParagraphPage },
+  // { path: '/exams/paragraphs/questions', name: 'Questions', element: QuestionPage },
 
 
 

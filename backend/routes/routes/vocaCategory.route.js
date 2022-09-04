@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var controller = require('../../controllers/vocabulary.category.controllers');
+var controller = require('../../controllers/exam.category.controllers');
 
 
 router.get('/getAll', controller.getAll);

@@ -80,6 +80,25 @@ const _nav = [
     ],
   },
   {
+    component: CNavGroup,
+    name: 'Đề thi',
+    to: '/exams',
+    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Quản lý nhóm đề thi',
+        to: '/exams_category',
+      },
+      {
+        component: CNavItem,
+        name: 'Quản lý đề thi',
+        to: '/exams',
+      },
+      
+    ],
+  },
+  {
     component: CNavTitle,
     name: 'Theme',
   },

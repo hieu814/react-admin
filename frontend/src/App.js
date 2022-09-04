@@ -1,10 +1,12 @@
 import React, { Component, Suspense } from 'react'
 import { HashRouter, Route, Routes, Navigate } from 'react-router-dom'
-import './scss/style.scss'
 import authApi from "./api/authApi";
 import { checkProfile } from './stores/global/globalSlice'
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import './scss/style.scss'
+import 'antd/dist/antd.css';
+import 'react-quill/dist/quill.snow.css';
 const loading = (
   <div className="pt-3 text-center">
     <div className="sk-spinner sk-spinner-pulse"></div>

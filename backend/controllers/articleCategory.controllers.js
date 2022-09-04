@@ -1,5 +1,6 @@
-const Models = require('../models/article_categories.model')
+const article_categoriesModel = require('../models/article_categories.model')
 var mongoose = require('mongoose');
+const MyError = require('../utils/MyError');
 exports.getAll = async (req, res, next) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit) : 20;
@@ -9,7 +10,7 @@ exports.getAll = async (req, res, next) => {
         let collections;
         let collectionCount;
         if (search) {
-            collections = await Models.find({
+            collections = await article_categoriesModel.find({
                 $or: [
                     {
                         name: { '$regex' : search, '$options' : 'i' },
@@ -18,12 +19,12 @@ exports.getAll = async (req, res, next) => {
             })
                 .skip(offset)
                 .limit(limit);
-            collectionCount = await Models.countDocuments({
+            collectionCount = await article_categoriesModel.countDocuments({
                 ticket: { $regex: search },
             });
         } else {
-            collections = await Models.find({}).skip(offset).limit(limit);
-            collectionCount = await Models.countDocuments();
+            collections = await article_categoriesModel.find({}).skip(offset).limit(limit);
+            collectionCount = await article_categoriesModel.countDocuments();
         }
 
         const totalPages = Math.ceil(collectionCount / limit);
@@ -45,7 +46,7 @@ exports.getAll = async (req, res, next) => {
 
 exports.getOne = async (req, res, next) => {
     const id = req.params.id;
-    Models.findById(id)
+    article_categoriesModel.findById(id)
         .then((value) => {
             res.status(200).json({
                 success: true,
@@ -61,7 +62,7 @@ exports.update = async (req, res, next) => {
     const id = req.params.id;
     const updateObject = req.body;
     updateObject.updatedBy = mongoose.Types.ObjectId(req.user),
-    Models.updateOne({ _id: id }, { $set: updateObject })
+    article_categoriesModel.updateOne({ _id: id }, { $set: updateObject })
         .exec()
         .then(() => {
             res.status(200).json({
@@ -77,7 +78,7 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
     const id = req.params.id;
-    Models.findByIdAndRemove(id)
+    article_categoriesModel.findByIdAndRemove(id)
         .exec()
         .then(() => res.status(200).json({
             success: true,
@@ -86,51 +87,42 @@ exports.delete = async (req, res, next) => {
         .catch((err) => next(err));
 }
 exports.insert = async (req, res, next) => {
-    const { name, type } = req.body
 
-
-    if (name && type  ) {
+    const { name, description } = req.body
+    console.log("req.body: ", req.body)
+    if (name) {
         try {
-            const checkData = await Models.findOne({ name });
+            const checkData = await article_categoriesModel.findOne({ name });
 
             if (checkData) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Category exists'
+                    message: 'Tên đã tồn tại'
                 });
 
             } else {
-                let data = {
-                    name: name,
-                    type: type,
+
+                const data = new article_categoriesModel({
+                    name,
+                    description,
                     createdBy: mongoose.Types.ObjectId(req.user),
                     updatedBy: mongoose.Types.ObjectId(req.user),
-                }
-
-                Models.create(data, function (err, user) {
-                    if (err) {
-                        return res.status(500).json({
-                            success: false,
-                            message:err
-                        })
-                    }else{
-                        return res.status(200).json({
-                            success: true,
-                            message: "OK"
-                        })
-                    }
-
                 })
-            }
+                await data.save();
 
+            }
+            return res.status(200).json({
+                success: false,
+                message: "OK"
+            })
 
         } catch (error) {
-            next(err)
+            next(error)
         }
     } else {
         return res.status(400).json({
             success: false,
-            message: "Please add infomation2"
+            message: "Xin hãy nhập thông tin"
         });
     }
 }

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from "react-redux";
 import * as Yup from "yup";
-import VocabularyApi from "src/api/vocabularyCategoryApi";
+import ArticleCategoryApi from "src/api/ArticleCategoryApi";
 import {successMessage, errorMessage} from 'src/views/components/MyMessage';
 import {
     CCol,
@@ -29,7 +29,7 @@ export const VocabularyValues = {
 
 };
 
-function VocabularyModal(props) {
+function MyModal(props) {
     const dispatch = useDispatch();
     const { isModalVisible, setIsModalVisible } = props;
     const [errorMsg, setErrorMsg] = useState(null);
@@ -42,10 +42,10 @@ function VocabularyModal(props) {
     const handleSubmit = async (values, actions) => {
         try {
             if(props.Vocabulary){
-                await VocabularyApi.update(props.Vocabulary._id,values)
+                await ArticleCategoryApi.update(props.Vocabulary._id,values)
                 successMessage("Sửa thành công.")
             }else{
-                await VocabularyApi.insert(values)
+                await ArticleCategoryApi.insert(values)
                 successMessage("Thêm thành công.")
             }
             setErrorMsg(null);
@@ -112,13 +112,13 @@ function VocabularyModal(props) {
 
     );
 }
-VocabularyModal.propTypes = {
+MyModal.propTypes = {
     isModalVisible: PropTypes.bool,
     setIsModalVisible: PropTypes.func,
     query: PropTypes.object,
 };
 
-VocabularyModal.defaultProps = {
+MyModal.defaultProps = {
     isModalVisible: false,
     setIsModalVisible: null,
     query: {
@@ -127,4 +127,4 @@ VocabularyModal.defaultProps = {
         size: 10,
     },
 };
-export default VocabularyModal;
+export default MyModal;
