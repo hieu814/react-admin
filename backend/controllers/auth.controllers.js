@@ -78,3 +78,27 @@ exports.verifyUser = async (req, res, next) => {
 		next(error)
 	}
 }
+
+exports.googleredirect = async (req, res, next) => {
+	try {
+		const _userInfor =  req.user._json
+		const email = _userInfor.email
+		console.log({user: req.user})
+
+		var user = await Users.findOne({ email });
+
+		if (!user) {
+			user = new Users({
+				email : email,
+				password : "User_" +req.user.id,
+				googleID:  req.user.id,
+				username : _userInfor.name
+			})
+			await user.save()
+		} 
+		console.log({user})
+		return res.json({ token : user._id });
+	} catch (error) {
+		return next(error);
+	}
+}

@@ -1,25 +1,31 @@
 const questionModel = require('../models/questions.model')
-const { questionSchema } = require('../models/questions.model')
+const questionSchema = require('../models/question.model')
+const examModel = require('../models/exams.model')
+const passageSchema = require('../models/passages.model')
 var mongoose = require('mongoose');
 const MyError = require('../utils/MyError')
 const awsS3Service = require('./AwsS3Service');
-const ExamService = require('../services/Exam.service')
 class QuestionService {
     async getQuestion(examID, part) {
         try {
+            console.log("examID: ", examID, "  part ", part)
             if (examID && part > 0 && part < 8) {
-                let _exam = await ExamService.getOne(examID).data
+                let _exam = await examModel.findById(examID)
+                console.log("_exam ", _exam)
                 let _questionIDs = _exam.questions
-                console.log("_questionIDs: ", _questionIDs)
-                const _questions = await questionModel.find({
-                    '_id': {
+                
+                const _questions = await questionModel.find(
+                    {
                         $and: [
-                            { $in: _questionIDs },
+                            {
+                                '_id': { $in: _questionIDs }
+                            },
                             { type: part },
 
                         ]
                     }
-                });
+                );
+                console.log("_questionIDs: ", _questions)
                 return _questions
             } else {
                 throw Error("Part không hợp lệ")
@@ -55,29 +61,21 @@ class QuestionService {
             })
             .catch((err) => { throw Error(err.message) });
     }
-    async insert(obj, examID) {
+    async insert(examID, obj) {
         const _question = obj
         delete _question['_id'];
         if (_question) {
             try {
-                const checkData = await questionModel.findOne({ name: _question.name });
-                if (checkData) {
-                    throw Error('Đề thi đã tồn tại')
-
-                } else {
-                    const data = new questionModel(_question)
-                    await data.save();
-                    if (examID) {
-                        await ExamService.addQuestionID(data._id);
-                    }
-                    return ({
-                        success: true,
-                        message: "OK",
-                        data: data
-                    })
+                const data = new questionModel(_question)
+                await data.save();
+                if (examID) {
+                    await this.addQuestionID(examID, data._id);
                 }
-
-
+                return ({
+                    success: true,
+                    message: "OK",
+                    data: data
+                })
             } catch (error) {
                 throw Error(error.message)
             }
@@ -85,11 +83,36 @@ class QuestionService {
             throw Error("Thiếu thông tin")
         }
     }
-
-    async delete(id) {
+    async addGroup(obj, examID) {
+        let _question = obj
+        delete _question['_id'];
+        if (_question) {
+            try {
+                let _from = _question.group.from
+                let _to = _question.group.to
+                if (_from > _to) {
+                    throw Error("from lớn hơn to")
+                }
+                let _questions = Array(_to - _from + 1).fill().map((_, idx) => new questionSchema({ number: _from + idx }))
+                _question.questions = _questions;
+                const data = new questionModel(_question)
+                await data.save();
+                if (examID) {
+                    await this.addQuestionID(examID, data._id);
+                }
+                return data;
+            } catch (error) {
+                throw Error(error.message)
+            }
+        } else {
+            throw Error("Thiếu thông tin")
+        }
+    }
+    async delete(examID, id) {
         try {
+            await this.deleteQuestionID(examID, id)
             await questionModel.findByIdAndDelete(id);
-            await ExamService.deleteQuestionID(id);
+            await this.deleteQuestionID(id);
             return ({
                 success: true,
                 message: 'OK'
@@ -124,5 +147,28 @@ class QuestionService {
         }
 
     }
+    async deleteQuestionID(examID, questionID) {
+        await examModel.updateOne({ _id: examID },
+            { $pull: { 'questions': mongoose.Types.ObjectId(questionID) } });
+    }
+    async addQuestionID(examID, questionID) {
+        await examModel.updateOne({ _id: examID },
+            { $push: { 'questions': mongoose.Types.ObjectId(questionID) } });
+    }
+    async parseRawQuestion(id, file) {
+        try {
+            // if (updateObject.image) {
+            //     await awsS3Service.deleteFile(updateObject.image);
+            // }
+            let options = { returnDocument: 'after' }
+            const url = await awsS3Service.uploadFile(file);
+            let data = await questionModel.updateOne({ _id: id }, { $set: { autio: url } }, options)
+                .exec()
+            return data;
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 module.exports = new QuestionService();

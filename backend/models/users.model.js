@@ -38,6 +38,8 @@ const usersSchema = new mongoose.Schema({
 		enum: ['USER', 'EDITOR','ADMIN'],
 		default: 'USER'
 	},
+	googleID: { type: String, trim: true },
+	facebookID: { type: String, trim: true },
 	resetPasswordToken: String,
 	refreshToken: String,
 })

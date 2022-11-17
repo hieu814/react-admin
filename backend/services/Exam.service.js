@@ -1,13 +1,14 @@
 var https = require('https');
-var concat = require('concat-stream');
-var eyes = require('eyes');
+
 const examModel = require('../models/exams.model')
 var mongoose = require('mongoose');
 const MyError = require('../utils/MyError')
 const wordService = require("../services/Word.service");
 const awsS3Service = require('../services/AwsS3Service');
 const slug = require("slug");
-const QuestionService = require('../services/Question.service')
+const ExamParser = require('../services/Exam.parser.service')
+const questionModel = require('../models/questions.model')
+const { extname } = require('path')
 var fs = require('fs'),
     xml2js = require('xml2js');
 var path = require("path");
@@ -171,6 +172,44 @@ class ExamService {
         }
 
 
+    }
+    async importCSV(file) {
+        // ExamParser
+        // const file = req.file
+
+        try {
+            let jsonData
+            let _questions = []
+            if (extname(file.originalname).toLowerCase() === '.xlsx') {
+                jsonData = await ExamParser.parseExcelData(file)
+            } else if (extname(file.originalname).toLowerCase() === '.csv') {
+                jsonData = await ExamParser.parseCSVData(file)
+            } else {
+                jsonData = 'Please upload xlsx or csv file'
+            }
+            // let promise = new Promise(function(resolve, reject) { // tương đương với ngỏ lời yêu
+            //     jsonData.questions?.forEach(async function (element) {
+            //         const data = new questionModel(element)
+            //         await data.save();
+            //         _questions.push(data)
+            //         // console.log(data)
+            //     });
+            // })
+           let datax = await  questionModel.insertMany(jsonData.questions, 
+            {ordered: false})
+            //   jsonData = JSON.parse(jsonData)
+            console.log(datax)
+            const data = new examModel({name:"asdads",questions:datax})
+            await data.save();
+            console.log(data)
+            return ({
+                success: true,
+                message: "OK",
+                data: data
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
     async parseXML(url) {
         var data = '';

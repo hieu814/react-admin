@@ -15,6 +15,12 @@ router.use(function timeLog(req, res, next) {
 // Define the home page route
 router.post('/signup', authController.register);
 router.post('/login', authController.login);
+router.get('/google',
+  passport.authenticate('google', { session: false, scope: ['openid', 'profile', 'email'] }));
+router.get('/google/redirect',
+  passport.authenticate('google', { session: false }),
+  authController.googleredirect);
+
 router.get('/profile', passport.authenticate('jwt', { session: false }), authController.profile);
 
 // Define the about route

@@ -3,7 +3,13 @@ const localStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 const UserModel = require('../models/users.model');
-
+var beURL = require('./../config/properties').backEndUrl;
+var GoogleStrategy = require('passport-google-oauth20');
+const passportConfig = {
+    clientID: "593466114236-0qmdm08m9c8v0i6ibdpcal9mrm25goad.apps.googleusercontent.com",
+    clientSecret: "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",
+    callbackURL: `/api/auth/google/redirect`
+};
 passport.use(
 	new JWTstrategy(
 		{
@@ -28,8 +34,8 @@ passport.use(
 			passwordField: 'password'
 		},
 		async (email, password, done) => {
-			console.log("email ", email);
-			console.log("password ", password);
+			// console.log("email ", email);
+			// console.log("password ", password);
 			try {
 				const user = await UserModel.findOne({ email }).select('+password');
 
@@ -52,3 +58,16 @@ passport.use(
 		}
 	)
 );
+
+// google
+passport.use(new GoogleStrategy({
+	clientID: passportConfig.clientID,
+	clientSecret: passportConfig.clientSecret,
+	callbackURL: passportConfig.callbackURL,
+	scope: [ 'profile' ],
+	state: true
+  },
+  function verify(accessToken, refreshToken, profile, cb) {
+	return cb(null, profile);
+  }
+));

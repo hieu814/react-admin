@@ -48,6 +48,20 @@ const Login = () => {
     }
 
   }
+  const googleLogin = async () => {
+    try {
+
+      const { token } = await authApi.googleLogin();
+      dispatch(checkProfile());
+      localStorage.setItem("token", token);
+      successMessage("Đăng nhập thành công: ")
+      return;
+    } catch (error) {
+      console.log("error: ", error)
+      errorMessage("Tài khoản hoặc mật khẩu không chính xác ", error)
+    }
+
+  }
   return (
 
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
@@ -114,6 +128,11 @@ const Login = () => {
                             Register Now!
                           </CButton>
                         </Link>
+                        <CCol xs={6}>
+                            <CButton color="primary" className="px-4" onClick={googleLogin}>
+                              Login wit google
+                            </CButton>
+                          </CCol>
                       </div>
                     </CCardBody>
                   </CCard>

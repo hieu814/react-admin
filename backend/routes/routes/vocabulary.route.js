@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var controller = require('../../controllers/vocabulary.controller');
 const multer = require('multer');
-const awsS3Service = require('../../services/AwsS3Service');
 const storage = multer.memoryStorage();
 var upload = multer({ storage: storage })
 

@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import examApi from "src/api/examApi";
+import questionApi from "src/api/questionApi";
 import examCategoryApi from "src/api/examCategoryApi";
 const KEY = "exam";
 
@@ -28,8 +29,8 @@ export const deleteExam = createAsyncThunk(
 export const fetchQuestions = createAsyncThunk(
 	`${KEY}/fetchQuestions`,
 	async (params, thunkApi) => {
-		const data = await examApi.fetchData(params);
-		return data;
+		const data = await questionApi.fetchData(params);
+		return data.data;
 	}
 );
 

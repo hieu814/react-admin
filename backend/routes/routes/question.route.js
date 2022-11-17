@@ -10,7 +10,8 @@ var upload = multer({ storage: storage })
 router.get('/getAll', controller.getAll);
 router.get('/:id', controller.getOne);
 router.patch('/:id', controller.update);
-router.delete('/:id', controller.delete);
+router.delete('/:id/:examID', controller.delete);
+router.post('/addGroup/:examID', controller.addGroup);
 router.post('', controller.insert);
 router.patch('/updateImage/:id', upload.single('image'),controller.updateImage);
 router.patch('/updateAudio/:id', upload.single('audio'),controller.updateAudio);

@@ -9,11 +9,11 @@ import {
 	CModalTitle,
 
 } from '@coreui/react'
-import vocabularyCategoryApi from "src/api/vocabularyCategoryApi";
+// import { questionApi } from "api";
 import { ImageField, InputField, UploadField } from "src/views/components/customfield";
 import { fetchQuestions } from "src/stores/exam/examSlice";
 import { useQuery } from "src/views/Exam/hooks";
-import { questionValues } from "src/views/Exam/initialAndValidateValues";
+import { groupQuestionValues, questionValues } from "src/views/Exam/initialAndValidateValues";
 import { FastField, Form, Formik } from "formik";
 import PropTypes from "prop-types";
 import React from "react";
@@ -35,34 +35,34 @@ function QuestionModal(props) {
 	const handleSubmit = async (values) => {
 		const { id, content, audio = "" } = values;
 		let question = { ...values };
-		console.log("question: ", question)
-		if (part === 1) {
-			question = { ...values, content: "null" };
-		}
 
-		if (part === 1 || part === 2) delete question.audio;
+		// if (part === 1) {
+		// 	question = { ...values, content: "null" };
+		// }
 
-		const response = await vocabularyCategoryApi.updateQuestion(id, question);
+		// if (part === 1 || part === 2) delete question.audio;
 
-		if (response.error) {
-			const error = response.error;
-			for (const property in error) {
-				message.error(error[property]);
-			}
-		} else {
-			if (part === 1) {
-				if (content && typeof content === "object")
-					await vocabularyCategoryApi.updateQuestionImage(id, content);
-			}
-			if (part === 1 || part === 2) {
-				if (audio && typeof audio === "object")
-					await vocabularyCategoryApi.updateQuestionAudio(id, audio);
-			}
+		// const response = await questionApi.updateQuestion(id, question);
 
-			message.success("Cập nhật thành công");
-			handleCancel();
-		}
-		dispatch(fetchQuestions({ examId, type: part }));
+		// if (response.error) {
+		// 	const error = response.error;
+		// 	for (const property in error) {
+		// 		message.error(error[property]);
+		// 	}
+		// } else {
+		// 	if (part === 1) {
+		// 		if (content && typeof content === "object")
+		// 			await questionApi.updateQuestionImage(id, content);
+		// 	}
+		// 	if (part === 1 || part === 2) {
+		// 		if (audio && typeof audio === "object")
+		// 			await questionApi.updateQuestionAudio(id, audio);
+		// 	}
+
+		// 	message.success("Cập nhật thành công");
+		// 	handleCancel();
+		// }
+		// dispatch(fetchQuestions({ examId, type: part }));
 	};
 
 	return (
@@ -72,8 +72,8 @@ function QuestionModal(props) {
 			</CModalHeader>
 			<CModalBody>
 				<Formik
-					// initialValues={groupQuestionToQuestion(initialValue)}
-					validationSchema={questionValues.validationSchema}
+					initialValues={initialValue}
+					validationSchema={groupQuestionValues.validationSchema}
 					onSubmit={handleSubmit}
 					enableReinitialize
 				>
@@ -86,74 +86,30 @@ function QuestionModal(props) {
 									size="middle"
 									style={{ width: "100%" }}
 								>
-									<FastField component={InputField} name="_id" type="hidden" />
-									{part > 1 && (
-										<FastField
-											name="question"
-											component={InputField}
-											title="Câu hỏi"
-											titleCol={6}
-											maxLength={200}
-											inputCol={18}
-											isRequire={true}
-										/>
-									)}
+									<FastField component={InputField} name="id" type="hidden" />
+									<FastField
+										name="from"
+										component={InputField}
+										type="number"
+										title="from"
+										titleCol={6}
+										maxLength={200}
+										inputCol={18}
+										isRequire={true}
+									/>
 
 									<FastField
-										name="A"
+										name="to"
 										component={InputField}
-										title="A"
+										type="number"
+										title="to"
 										titleCol={6}
 										maxLength={200}
 										inputCol={18}
 										isRequire={true}
 									/>
-									<FastField
-										name="B"
-										component={InputField}
-										title="B"
-										titleCol={6}
-										maxLength={200}
-										inputCol={18}
-										isRequire={true}
-									/>
-									<FastField
-										name="C"
-										component={InputField}
-										title="C"
-										titleCol={6}
-										maxLength={200}
-										inputCol={18}
-										isRequire={true}
-									/>
-									<FastField
-										name="D"
-										component={InputField}
-										title="D"
-										titleCol={6}
-										maxLength={200}
-										inputCol={18}
-										isRequire={true}
-									/>
-									<FastField
-										name="correct"
-										component={InputField}
-										title="Đáp án"
-										titleCol={6}
-										maxLength={200}
-										inputCol={18}
-										isRequire={true}
-									/>
-									{part > 1(<FastField
-										name="transcript"
-										component={InputField}
-										title="Giải thích"
-										titleCol={6}
-										maxLength={200}
-										inputCol={18}
-									/>)}
 
-									{[1, 2, 3, 4].includes(part) && (
+									{[3, 4].includes(part) && (
 										<FastField
 											name="audio"
 											component={UploadField}
@@ -164,9 +120,9 @@ function QuestionModal(props) {
 										/>
 									)}
 
-									{part === 1 && (
+									{[3, 4].includes(part) && (
 										<FastField
-											name="content"
+											name="image"
 											component={ImageField}
 											title="Hình ảnh"
 											titleCol={6}

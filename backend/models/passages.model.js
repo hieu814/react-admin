@@ -1,8 +1,9 @@
 const mongoose = require('mongoose')
 
 const passagesSchema = new mongoose.Schema({
-    paragraph: { type: String, trim: true },
+    order:{ type: Number, default: 1 },
+    content: { type: String, trim: true },
     image: { type: String, trim: true },
 })
 
-module.exports = mongoose.model('passages', passagesSchema)
+module.exports = mongoose.model('passage', passagesSchema)

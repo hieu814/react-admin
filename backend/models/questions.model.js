@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
-const{passageSchema,questionSchema} = require('./question.data.model')
+const questionSchema = require('./question.model').schema
+const passageSchema = require('./passages.model').schema
 const groupQuestionSchema = new mongoose.Schema(
 	{
 		type: { type: Number, required: true, default: 1 },
@@ -9,6 +10,7 @@ const groupQuestionSchema = new mongoose.Schema(
 		},
 		passages: [passageSchema],
 		questions: [questionSchema],
+		transcript: { type: String, trim: true ,default: ""},
 		image: { type: String, trim: true },
 		audio: { type: String, trim: true },
 	}

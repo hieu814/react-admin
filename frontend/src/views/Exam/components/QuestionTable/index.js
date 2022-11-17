@@ -5,59 +5,100 @@ import React from "react";
 import QuestionAction from "../QuestionAction";
 import DataTable from 'react-data-table-component';
 import imageNotFound from "src/assets/images/image-not-found.svg";
+import commonFuc from "src/utils/commonFuc";
 function QuestionTable(props) {
 	const { setInitialValue, setIsModalVisible, questions, setIsDetailViewMode } =
 		props;
-		const columns = [
-			{
-				name: 'STT',
-				selector: row => row.stt,
-				sortable: true
-			},
-			{
-				name: 'Câu hỏi',
-				selector: row => row.name,
-				cell: (row, index, column, id) =>{
-					return row.type === 1 ? (
-						<Image
-							width={120}
-							src={row.image}
-							height={80}
-							fallback={imageNotFound}
-							style={{
-								objectFit: "cover",
-								backgroundPosition: "center center",
-							}}
-						/>
-					) : (
-						<>{"content"}</>
-					);
+	const columns_listening = [
+		{
+			name: 'Câu hỏi',
+			selector: row => row.group,
+			cell: (row, index, column, id) => {
+				let _qs
+				console.log(" ---- row: ", row)
+				if ([3, 4].includes(row.type)) {
+					_qs = `Question ${row.group.from} - ${row.group.to}`
+				} else {
+					_qs = `Question ${row.group.from}`
 				}
-			},
-			{
-				name: '',
-				button: true,
-				allowOverflow: true,
-				ignoreRowClick: true,
-				cell: (row, index, column, id) => (
-					<QuestionAction
+				return (
+					<>{_qs}</>
+				);
+			}
+		},
+		{
+			name: 'Hình ảnh',
+			selector: row => row.image,
+			cell: (row, index, column, id) => {
+				return (
+					<Image
+						width={120}
+						src={row.image}
+						height={80}
+						fallback={imageNotFound}
+						style={{
+							objectFit: "cover",
+							backgroundPosition: "center center",
+						}}
+					/>
+				);
+			}
+		},
+		{
+			name: '',
+			button: true,
+			allowOverflow: true,
+			ignoreRowClick: true,
+			cell: (row, index, column, id) => (
+				<QuestionAction
 					question={row}
 					setInitialValue={setInitialValue}
 					setIsModalVisible={setIsModalVisible}
 					setIsDetailViewMode={setIsDetailViewMode}
 				/>
-				)
+			)
+		}
+	];
+	const columns_reading = [
+		{
+			name: 'Câu hỏi',
+			selector: row => row.group,
+			cell: (row, index, column, id) => {
+				let _qs
+				if (row.type !== 5) {
+					_qs = `Question ${row.group.from} - ${row.group.to}`
+				} else {
+					_qs = `Question ${row.group.from}`
+				}
+				return (
+					<>{_qs}</>
+				);
 			}
-		];
+		},
+		{
+			name: '',
+			button: true,
+			allowOverflow: true,
+			ignoreRowClick: true,
+			cell: (row, index, column, id) => (
+				<QuestionAction
+					question={row}
+					setInitialValue={setInitialValue}
+					setIsModalVisible={setIsModalVisible}
+					setIsDetailViewMode={setIsDetailViewMode}
+				/>
+			)
+		}
+	];
 	return (
 		<DataTable
-		title="Quản lý bài học"
-		columns={columns}
-		data={questions}
-		pagination={true}
+			title="Quản lý bài học"
+			columns={[1, 2, 3, 4].includes(props.part) ? columns_listening : columns_reading}
+			data={(questions)}
+			pagination={true}
 
 
-	  />
+		/>
 	);
 }
 

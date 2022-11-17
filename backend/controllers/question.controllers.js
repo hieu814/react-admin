@@ -1,7 +1,9 @@
 const QuestionService = require('../services/Question.service')
 exports.getAll = async (req, res, next) => {
     try {
-        const data = await QuestionService.getAll(req.query)
+        const examID = req.query.examID 
+        const part = req.query.part 
+        const data = await QuestionService.getQuestion(examID,part)
         res.status(200).send({
             data: data
         });
@@ -32,9 +34,10 @@ exports.update = async (req, res, next) => {
 }
 
 exports.delete = async (req, res, next) => {
-    const id = req.params.id;
+    const id = req.params.id; //examID
+    const examID = req.params.examID; //examID
     try {
-        const data = await QuestionService.delete(id)
+        const data = await QuestionService.delete(examID,id)
         res.status(200).send(data);
     } catch (err) {
         next(err)
@@ -76,5 +79,13 @@ exports.updateAudio = async (req, res, next) => {
     } catch (error) {
         next(error)
     }
-
+}
+exports.addGroup = async (req, res, next) => {
+    try {
+        const examID = req.params.examID;
+        const data = await QuestionService.addGroup(req.body,examID)
+        res.status(200).send(data);
+    } catch (err) {
+        next(err)
+    }
 }

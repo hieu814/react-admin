@@ -25,6 +25,9 @@ QuestionPage.propTypes = {};
 
 function QuestionPage(props) {
 	const query = useQuery();
+	const examId = query.get("examId");
+	const type = +query.get("part");
+	const questionId = +query.get("questionId");
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -33,35 +36,33 @@ function QuestionPage(props) {
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [initialValue, setInitialValue] = useState(questionValues.initial);
 	const [isDetailViewMode, setIsDetailViewMode] = useState(false);
-	const [examId, setExamId] = useState(null);
-	const [questionId, setQuestionID] = useState(null);
-	const [type, setType] = useState(null);
+
 
 
 	useEffect(() => {
-		setExamId(query.get("examId"))
-		setType(query.get("part"))
-		setQuestionID(query.get("questionId"))
-		if (questionId) {
-			dispatch(fetchQuestions({ examId, type }));
-		} else {
-			if (typeof examId === "string" && typeof type === "number") {
-				if (type < 1) {
-					navigate(`/exams/questions?examId=${examId}&part=1`);
-					dispatch(fetchQuestions({ examId, type: 1 }));
-				} else if (type > 7) {
-					navigate(`/exams/paragraphs?examId=${examId}&part=7`);
-				} else {
-					if ([1, 2, 5].includes(type)) {
-						dispatch(fetchQuestions({ examId, type }));
-					} else {
-						navigate(
-							`/exams/paragraphs?examId=${examId}&part=${type}`
-						);
-					}
-				}
-			}
-		}
+		console.log("-------- QuestionPage useEffect examId ", examId, " - ", type)
+		dispatch(fetchQuestions({ examID: examId, part: type }));
+		// if (questionId) {
+
+		// } else {
+		// 	if (typeof examId === "string" && typeof type === "number") {
+		// 		if (type < 1) {
+		// 			navigate(`/exams/questions?examId=${examId}&part=1`);
+		// 			dispatch(fetchQuestions({ examID: examId, part: type }));
+		// 		} else if (type > 7) {
+		// 			navigate(`/exams/paragraphs?examId=${examId}&part=7`);
+		// 		} else {
+		// 			if ([1, 2, 5].includes(type)) {
+
+		// 				dispatch(fetchQuestions({ examID: examId, part: type }));
+		// 			} else {
+		// 				navigate(
+		// 					`/exams/paragraphs?examId=${examId}&part=${type}`
+		// 				);
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}, []);
 
 	return examId && type ? (
@@ -74,7 +75,7 @@ function QuestionPage(props) {
 					<CButton
 						color={"primary"}
 
-					// onClick={() => handleOnClick()}
+						onClick={() => setIsModalVisible(true)}
 					>
 						{"Thêm"}
 					</CButton>
@@ -89,9 +90,10 @@ function QuestionPage(props) {
 							<QuestionTable
 								questions={
 									questionId
-										? questions.find((p) => p.id === questionId)?.questions
+										? questions.find((p) => p._id === questionId)?.questions
 										: questions
 								}
+								part={type}
 								setInitialValue={setInitialValue}
 								setIsModalVisible={setIsModalVisible}
 								setIsDetailViewMode={setIsDetailViewMode}

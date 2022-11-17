@@ -22,13 +22,26 @@ exports.update = async (req, res, next) => {
     const id = req.params.id;
     const updateObject = req.body;
     try {
-        const data = await ExamService.update(id,updateObject)
+        const data = await ExamService.update(id, updateObject)
         res.status(200).send(data);
     } catch (err) {
         next(err)
     }
 }
-
+exports.importCSV = async (req, res, next) => {
+    const file = req.file
+    if (!file) {
+        const error = new Error('Please upload a file')
+        error.httpStatusCode = 400
+        return next(error)
+    }
+    try {
+        await ExamService.importCSV(file)
+        res.status(200).send("Thành công");
+    } catch (err) {
+        next(err)
+    }
+}
 exports.delete = async (req, res, next) => {
     const id = req.params.id;
     try {
@@ -48,10 +61,10 @@ exports.insert = async (req, res, next) => {
 }
 exports.test = async (req, res, next) => {
     try {
-       
-       const data = await ExamService.parseWord()
-       console.log("----------------send ")
-       res.send(data)
+
+        const data = await ExamService.parseWord()
+        console.log("----------------send ")
+        res.send(data)
     } catch (err) {
         next(err)
     }

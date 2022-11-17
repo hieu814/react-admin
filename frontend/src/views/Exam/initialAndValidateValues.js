@@ -10,13 +10,13 @@ export const examValues = {
 
 	validationSchema: Yup.object().shape({
 		name: Yup.string().required("Tên đề thi không được bỏ trống"),
-		category: Yup.string().required( "Bộ đề không được bỏ trống"),
+		category: Yup.string().required("Bộ đề không được bỏ trống"),
 	}),
 };
 
 export const paragraphValues = {
 	initial: {
-		id: 0,
+		_id: 0,
 		content: "",
 		transcript: "",
 		image: null,
@@ -30,23 +30,44 @@ export const paragraphValues = {
 
 export const questionValues = {
 	initial: {
-		id: 0,
-		content: "",
+		_id: "",
+		question: "",
 		a: "",
 		b: "",
 		c: "",
 		d: "",
-		result: "",
-		extra: "",
+		correct: "",
 		image: null,
 		audio: null,
 	},
 
-	validationSchema: Yup.object().shape({
+	val_idationSchema: Yup.object().shape({
 		content: Yup.string().required("Câu hỏi không được bỏ trống"),
 		a: Yup.string().required("Không được bỏ trống"),
 		b: Yup.string().required("Không được bỏ trống"),
 		c: Yup.string().required("Không được bỏ trống"),
 		result: Yup.string().required("Đáp án không được bỏ trống"),
+	}),
+};
+export const groupQuestionValues = {
+	initial: {
+		_id: "",
+		from: 0,
+		to: 0,
+		image: null,
+		audio: null,
+	},
+
+	validationSchema: Yup.object().shape({
+		from: Yup.number()
+			.positive("Không hợp lệ")
+			.integer("Không hợp lệ")
+			.min(1).max(200)
+			.required('Không được để trống'),
+		to: Yup.number()
+			.positive("Không hợp lệ")
+			.integer("Không hợp lệ")
+			.min(1).max(200)
+			.required('Không được để trống'),
 	}),
 };

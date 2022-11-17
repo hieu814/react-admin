@@ -12,6 +12,27 @@ const commonFuc = {
 			reader.onerror = (error) => reject(error);
 		});
 	},
+	groupQuestionToQuestion(group) {
+		try {
+			let _question = group.questions[0]
+			_question.image = group.image
+			_question.audio = group.audio
+			return _question
+		} catch (error) {
+
+		}
+		return {
+			_id: "",
+			question: "",
+			a: "",
+			b: "",
+			c: "",
+			d: "",
+			correct: "",
+			image: null,
+			audio: null,
+		}
+	}
 };
 
 export default commonFuc;
