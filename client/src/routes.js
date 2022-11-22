@@ -28,6 +28,7 @@ const exam = React.lazy(() => import('./views/Exam'))
 const exam_category = React.lazy(() => import('./views/exam_category'))
 const ParagraphPage = React.lazy(() => import( "./views/Exam/pages/ParagraphPage"))
 const QuestionPage = React.lazy(() =>  import("./views/Exam/pages/QuestionPage"))
+const QuestionDetailPage = React.lazy(() =>  import("./views/Exam/pages/QuestionPage2"))
 
 
 // Base
@@ -87,7 +88,8 @@ const routes = [
   { path: '/article_category', name: 'Article Category', element: article_category },
   { path: '/exams/*', name: 'Exam', element: exam },
   { path: '/exams_category', name: 'Exam Category', element: exam_category },
-  // { path: '/exams/questions', name: 'questions', element: QuestionPage },
+   { path: '/exams/questions', name: 'questions', element: QuestionPage },
+   { path: '/exams/questionDetail', name: 'Question', element: QuestionDetailPage },
   // { path: '/exams/paragraphs', name: 'paragraphs', element: ParagraphPage },
   // { path: '/exams/paragraphs/questions', name: 'Questions', element: QuestionPage },
 

@@ -13,7 +13,7 @@ class QuestionService {
                 let _exam = await examModel.findById(examID)
                 console.log("_exam ", _exam)
                 let _questionIDs = _exam.questions
-                
+
                 const _questions = await questionModel.find(
                     {
                         $and: [
@@ -36,16 +36,8 @@ class QuestionService {
         }
     }
     async getOne(id) {
-        questionModel.findById(id)
-            .then((value) => {
-                return ({
-                    success: true,
-                    data: value,
-                });
-            })
-            .catch((err) => {
-                throw Error(err.message)
-            });
+        const qs = await questionModel.findById(id);
+        return { data: qs }
     }
 
     async update(id, obj) {

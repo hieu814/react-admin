@@ -71,7 +71,7 @@ function QuestionModal(props) {
 			</CModalHeader>
 			<CModalBody>
 				<Formik
-					// initialValues={groupQuestionToQuestion(initialValue)}
+					 initialValues={initialValue}
 					validationSchema={questionValues.validationSchema}
 					onSubmit={handleSubmit}
 					enableReinitialize

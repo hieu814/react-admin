@@ -17,7 +17,14 @@ const questionApi = {
 		const url = `${BASE_URL}/${id}/${examID}`;
 		return axiosClient.delete(url);
 	},
-
+	get: (id) => {
+		const url = `${BASE_URL}/${id}`;
+		return axiosClient.get(url);
+	},
+	update: (id, Data) => {
+		const url = `${BASE_URL}/${id}`;
+		return axiosClient.patch(url, Data);
+	},
 	updateGroupQuestion: (id, Data) => {
 		const url = `${BASE_URL}/${id}`;
 		return axiosClient.patch(url, Data);

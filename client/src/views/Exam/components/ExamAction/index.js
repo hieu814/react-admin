@@ -24,7 +24,7 @@ function ExamAction(props) {
 	const dispatch = useDispatch();
 
 	const handleOnDetailClick = (part) => {
-		const page = [1, 2, 5].includes(part) ? "questions" : "paragraphs";
+		const page = "questions";
 		navigate(`/exams/${page}?examId=${exam._id}&part=${part}`);
 	};
 

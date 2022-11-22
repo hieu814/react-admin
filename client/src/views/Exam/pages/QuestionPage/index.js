@@ -34,13 +34,13 @@ function QuestionPage(props) {
 
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [initialValue, setInitialValue] = useState(questionValues.initial);
-	const [isDetailViewMode, setIsDetailViewMode] = useState(false);
 
 
 
 	useEffect(() => {
 		console.log("-------- QuestionPage useEffect examId ", examId, " - ", type)
 		dispatch(fetchQuestions({ examID: examId, part: type }));
+		console.log({questions})
 		// if (questionId) {
 
 		// } else {
@@ -93,7 +93,6 @@ function QuestionPage(props) {
 								part={type}
 								setInitialValue={setInitialValue}
 								setIsModalVisible={setIsModalVisible}
-								setIsDetailViewMode={setIsDetailViewMode}
 							/>
 
 							{isModalVisible && (

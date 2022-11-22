@@ -33,13 +33,13 @@ function ParagraphPage(props) {
 			if (type < 1) {
 				navigate(`/exams/questions?examId=${examId}&part=1`);
 			} else if (type > 7) {
-				navigate(`/admin/exams/paragraphs?examId=${examId}&part=7`);
+				navigate(`/exams/paragraphs?examId=${examId}&part=7`);
 				dispatch(fetchQuestions({ examId, type: 7 }));
 			} else {
 				if (![1, 2, 5].includes(type)) {
 					dispatch(fetchQuestions({ examId, type }));
 				} else {
-					navigate(`/admin/exams/questions?examId=${examId}&part=${type}`);
+					navigate(`/exams/questions?examId=${examId}&part=${type}`);
 				}
 			}
 		}

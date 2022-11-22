@@ -33,13 +33,20 @@ export const fetchQuestions = createAsyncThunk(
 		return data.data;
 	}
 );
-
+export const fetchQuestionDetail = createAsyncThunk(
+	`${KEY}/fetchQuestionDetail`,
+	async (params, thunkApi) => {
+		const data = await questionApi.get(params);
+		return data.data;
+	}
+);
 const examSlice = createSlice({
 	name: KEY,
 	initialState: {
 		isLoading: false,
 		examsPage: {},
 		questions: [],
+		question: {},
 		categories: [],
 	},
 	reducers: {
@@ -63,6 +70,14 @@ const examSlice = createSlice({
 		[fetchQuestions.fulfilled]: (state, action) => {
 			state.isLoading = false;
 			state.questions = action.payload;
+		},
+		[fetchQuestionDetail.pending]: (state, action) => {
+			state.isLoading = true;
+		},
+
+		[fetchQuestionDetail.fulfilled]: (state, action) => {
+			state.isLoading = false;
+			state.question = action.payload;
 		},
 		[fetchCategories.pending]: (state, action) => {
 			state.isLoading = true;
