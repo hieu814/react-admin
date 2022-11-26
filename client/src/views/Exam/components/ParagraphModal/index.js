@@ -1,30 +1,28 @@
 import { EditOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Button, Col, message, Row, Space, Spin } from "antd";
-// import { paragraphApi } from "api";
 import {
-    CButton,
-    CModal,
-    CModalBody,
-    CModalFooter,
-    CModalHeader,
-    CModalTitle,
+	CButton,
+	CModal,
+	CModalBody,
+	CModalFooter,
+	CModalHeader,
+	CModalTitle,
 
 } from '@coreui/react'
-import { EditorField, ImageField, InputField, UploadField } from "src/views/components/customfield";
+import { ImageField, InputField, UploadField } from "src/views/components/customfield";
 import { fetchQuestions } from "src/stores/exam/examSlice";
 import { useQuery } from "src/views/Exam/hooks";
-import { paragraphValues } from "src/views/Exam/initialAndValidateValues";
+import { questionValues } from "src/views/Exam/initialAndValidateValues";
 import { FastField, Form, Formik } from "formik";
 import PropTypes from "prop-types";
 import React from "react";
 import { useDispatch } from "react-redux";
-
+import questionApi from "src/api/questionApi"
 function ParagraphModal(props) {
-	const { isModalVisible, setIsModalVisible, initialValue } = props;
+	const { isModalVisible, setIsModalVisible, initialValue, setInitialValue } = props;
 
 	const query = useQuery();
-	const examId = query.get("examId");
-	const part = +query.get("part");
+	const questionId = query.get("questionId");
 
 	const dispatch = useDispatch();
 
@@ -33,89 +31,51 @@ function ParagraphModal(props) {
 	};
 
 	const handleSubmit = async (values) => {
-		console.log(initialValue);
-		const { id, content, transcript, image } = values;
-		let paragraph = { content, transcript };
+		let passage = { ...values };
 
-		if (part === 3 || part === 4) {
-			paragraph = { transcript, content: "null" };
-			delete paragraph.audio;
-		}
-
-		const response =""// await paragraphApi.updateParagraph(id, paragraph);
-
+		const response = await questionApi.updateQuestion(questionId, { passage: passage });
+		console.log({ response })
 		if (response.error) {
 			const error = response.error;
 			for (const property in error) {
 				message.error(error[property]);
 			}
 		} else {
-			// if (image && typeof image === "object")
-				// await paragraphApi.updateParagraphImage(id, image);
-
-			if (part === 3 || part === 4) {
-				// if (content && typeof content === "object")
-					// await paragraphApi.updateParagraphAudio(id, content);
-			}
-
 			message.success("Cập nhật thành công");
 			handleCancel();
 		}
-		dispatch(fetchQuestions({ examId, type: part }));
+		// dispatch(fetchQuestions({ examId, type: part }));
 	};
 
 	return (
 		<CModal size="xl" alignment="center" visible={isModalVisible} onClose={() => handleCancel()}>
-		<CModalHeader>
-			<CModalTitle>Thao tác</CModalTitle>
-		</CModalHeader>
-		<CModalBody>
-		<Formik
+			<CModalHeader>
+				<CModalTitle>Thao tác</CModalTitle>
+			</CModalHeader>
+			<CModalBody>
+				<Formik
 					initialValues={initialValue}
-					validationSchema={paragraphValues.validationSchema}
 					onSubmit={handleSubmit}
 					enableReinitialize
 				>
 					{(formikProps) => {
 						const { values, errors, touched, isSubmitting } = formikProps;
 						return (
-							<Form>
+							<Form id="form">
 								<Space
 									direction="vertical"
 									size="middle"
 									style={{ width: "100%" }}
 								>
-									<FastField component={InputField} name="id" type="hidden" />
-
-									{[3, 4].includes(part) ? (
-										<FastField
-											name="content"
-											component={UploadField}
-											title="Audio"
-											titleCol={6}
-											inputCol={18}
-											fileType="audio/*"
-											isRequire={true}
-										/>
-									) : (
-										<FastField
-											name="content"
-											component={EditorField}
-											title="Nội dung"
-											titleCol={6}
-											maxLength={200}
-											inputCol={18}
-											isRequire={true}
-										/>
-									)}
-
+									<FastField component={InputField} name="_id" type="hidden" />
 									<FastField
-										name="transcript"
-										component={EditorField}
-										title="Bản dịch"
+										name="content"
+										component={InputField}
+										title="Đoạn Văn"
 										titleCol={6}
 										maxLength={200}
 										inputCol={18}
+										isRequire={true}
 									/>
 
 									<FastField
@@ -125,35 +85,25 @@ function ParagraphModal(props) {
 										titleCol={6}
 										maxLength={200}
 										inputCol={18}
+										isRequire={true}
 									/>
+
 								</Space>
-								<Row justify="end" style={{ marginTop: "20px" }}>
-									<Col>
-										<Space size="middle">
-											<Button onClick={handleCancel}>Hủy</Button>
-
-											<Button htmlType="submit" type="primary">
-
-												Lưu
-											</Button>
-										</Space>
-									</Col>
-								</Row>
 							</Form>
 						);
 					}}
 				</Formik>
 
-		</CModalBody>
-		<CModalFooter>
-			<CButton color="secondary" onClick={() => handleCancel()}>
-				Close
-			</CButton>
-			<CButton color="primary" type="submit" form='my-form'>
-				Lưu
-			</CButton>
-		</CModalFooter>
-	</CModal>
+			</CModalBody>
+			<CModalFooter>
+				<CButton color="secondary" onClick={() => handleCancel()}>
+					Close
+				</CButton>
+				<CButton color="primary" type="submit" form='form'>
+					Lưu
+				</CButton>
+			</CModalFooter>
+		</CModal>
 
 	);
 }
@@ -166,6 +116,6 @@ ParagraphModal.propTypes = {
 ParagraphModal.defaultProps = {
 	isModalVisible: false,
 	setIsModalVisible: null,
-	initialValue: paragraphValues.initial,
+	initialValue: questionValues.initial,
 };
 export default ParagraphModal;

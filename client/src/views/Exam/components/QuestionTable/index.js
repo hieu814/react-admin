@@ -15,15 +15,10 @@ function QuestionTable(props) {
 			name: 'Câu hỏi',
 			selector: row => row.group,
 			cell: (row, index, column, id) => {
-				let _qs
-				if ([3, 4].includes(row.type)) {
-					_qs = `Question ${row.group.from} - ${row.group.to}`
-				} else {
-					_qs = `Question ${row.group.from}`
+				if (row.group.from === row.group.to) {
+					return (<>{`Question ${row.group.from}`}</>);
 				}
-				return (
-					<>{_qs}</>
-				);
+				return (<>{`Question ${row.group.from} - ${row.group.to}`}</>);
 			}
 		},
 		{
@@ -58,26 +53,16 @@ function QuestionTable(props) {
 			)
 		}
 	];
-	// 	<QuestionAction
-	// 	question={row}
-	// 	setInitialValue={setInitialValue}
-	// 	setIsModalVisible={setIsModalVisible}
-	// 	setIsDetailViewMode={setIsDetailViewMode}
-	// />
+
 	const columns_reading = [
 		{
 			name: 'Câu hỏi',
 			selector: row => row.group,
 			cell: (row, index, column, id) => {
-				let _qs
-				if (row.type !== 5) {
-					_qs = `Question ${row.group.from} - ${row.group.to}`
-				} else {
-					_qs = `Question ${row.group.from}`
+				if (row.group.from === row.group.to) {
+					return (<>{`Question ${row.group.from}`}</>);
 				}
-				return (
-					<>{_qs}</>
-				);
+				return (<>{`Question ${row.group.from} - ${row.group.to}`}</>);
 			}
 		},
 		{
@@ -96,7 +81,7 @@ function QuestionTable(props) {
 	];
 	return (
 		<DataTable
-			title="Quản lý bài học"
+
 			columns={[1, 2, 3, 4].includes(props.part) ? columns_listening : columns_reading}
 			data={(questions)}
 			pagination={true}

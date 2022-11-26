@@ -4,54 +4,50 @@ import PropTypes from "prop-types";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 function QuestionAction(props) {
-	const { setIsModalVisible } =
-		props;
 	const navigate = useNavigate()
+	const { setIsModalVisible, question } = props;
 	const handleOnUpdateClick = () => {
 		setIsModalVisible(true);
 	};
 	const handleDetailClick = () => {
-		navigate(`/exams/questionDetail?questionId=${props.question._id || ""}`);
+		navigate(`/exams/questionDetail?questionId=${question._id || "-"}`);
 	};
 	const handlePasageClick = () => {
-		setIsModalVisible(true);
+		///exams/paragraphs
+		navigate(`/exams/paragraphs?questionId=${question._id || "-"}`);
 	};
 
 	const menu = (
 		<Menu>
-
 			{
-				props.question.type === 1 || props.question.type === 2 || props.question.type === 5 ?
-					(<Menu.Item onClick={handleOnUpdateClick}>
+				![6, 7].includes(question.type) &&
+				(
+					<Menu.Item onClick={handleOnUpdateClick}>
 						<div className="menu-adjust--center">
 							<EditTwoTone twoToneColor="#ad8b00" />
-							<span className="menu-title">Sửa</span>
+							<span className="menu-title">{question.type}</span>
 						</div>
 					</Menu.Item>
-					) : (<div></div>
-					)
+				)
 			}
-
+			{([1, 2, 3, 5].includes(props.type)) && (<Menu.Divider />)}
 			{
-				props.question.type === 1 || props.question.type === 2 || props.question.type === 5 ?
-					(<div>
+				(![1, 2, 3, 5].includes(props.type)) && (<Menu.Item onClick={handleDetailClick}>
+					<div className="menu-adjust--center">
+						<InfoCircleTwoTone />
+						<span className="menu-title">Chi tiết câu hỏi</span>
 					</div>
-					) : (<Menu.Item onClick={handleDetailClick}>
-						<div className="menu-adjust--center">
-							<InfoCircleTwoTone />
-							<span className="menu-title">Chi tiết câu hỏi</span>
-						</div>
-					</Menu.Item>)
+				</Menu.Item>)
 			}
-			{/* <Menu.Divider /> */}
+			{(question?.passages.length > 0) && (<Menu.Divider />)}
 			{
-				props.question.type === 6 || props.question.type === 7 ?
-					(<Menu.Item onClick={handlePasageClick}>
-						<div className="menu-adjust--center">
-							<InfoCircleTwoTone />
-							<span className="menu-title">Chi tiết đoạn văn</span>
-						</div>
-					</Menu.Item>) : (<div></div>)
+				(question?.passages.length > 0) &&
+				(<Menu.Item onClick={handlePasageClick}>
+					<div className="menu-adjust--center">
+						<InfoCircleTwoTone />
+						<span className="menu-title">Chi tiết đoạn văn</span>
+					</div>
+				</Menu.Item>)
 			}
 		</Menu>
 	);

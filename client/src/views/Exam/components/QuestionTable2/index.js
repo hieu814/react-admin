@@ -9,7 +9,7 @@ import {
 	CButton,
 } from '@coreui/react'
 function QuestionTable(props) {
-	const { setIsModalVisible, questions,setInitialValue } = props;
+	const { setIsModalVisible, questions, setInitialValue } = props;
 	const columns_listening = [
 		{
 			name: 'Câu',
@@ -29,7 +29,7 @@ function QuestionTable(props) {
 			name: 'Đáp án',
 			selector: row => row.corectanswer,
 			cell: (row, index, column, id) => {
-				return<>{row?.corectanswer}</>
+				return <>{row?.corectanswer}</>
 			}
 		},
 		{
@@ -42,7 +42,7 @@ function QuestionTable(props) {
 					color={"primary"}
 					key={1}
 
-					onClick={() =>{ 
+					onClick={() => {
 						setInitialValue(row)
 						setIsModalVisible(true)
 					}}
@@ -55,7 +55,7 @@ function QuestionTable(props) {
 
 	return (
 		<DataTable
-			 title={JSON.stringify(questions[1])}
+			title={props.title || ""}
 			columns={columns_listening}
 			data={questions}
 			pagination={true}

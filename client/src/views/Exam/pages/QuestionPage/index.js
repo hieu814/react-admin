@@ -16,10 +16,6 @@ import {
 	CCardHeader,
 	CCol,
 	CRow,
-	CButton,
-	CForm,
-	CFormInput,
-	CFormSelect
 } from '@coreui/react'
 QuestionPage.propTypes = {};
 
@@ -40,7 +36,7 @@ function QuestionPage(props) {
 	useEffect(() => {
 		console.log("-------- QuestionPage useEffect examId ", examId, " - ", type)
 		dispatch(fetchQuestions({ examID: examId, part: type }));
-		console.log({questions})
+		console.log({ questions })
 		// if (questionId) {
 
 		// } else {
@@ -68,23 +64,7 @@ function QuestionPage(props) {
 		<div>
 			<CRow>
 				<CCol xs={12}>
-					<Divider orientation="left">
-						<Title level={3}>{`Part ${query.get("part")}`}</Title>
-					</Divider>
-					<CButton
-						color={"primary"}
-
-						onClick={() => setIsModalVisible(true)}
-					>
-						{"Thêm"}
-					</CButton>
-
-				</CCol>
-				<CCol xs={12}>
 					<CCard className="mb-4">
-						<CCardHeader>
-
-						</CCardHeader>
 						<CCardBody>
 							<QuestionTable
 								questions={
@@ -103,14 +83,6 @@ function QuestionPage(props) {
 									initialValue={initialValue}
 								/>
 							)}
-
-							{/* {isDetailViewMode && (
-								<QuestionDetailModal
-									isDetailViewMode={isDetailViewMode}
-									setIsDetailViewMode={setIsDetailViewMode}
-									question={initialValue}
-								/>
-							)} */}
 						</CCardBody>
 					</CCard>
 

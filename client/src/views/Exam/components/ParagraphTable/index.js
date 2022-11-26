@@ -1,104 +1,77 @@
-import { Image, Table } from "antd";
-import Column from "antd/lib/table/Column";
+
 import PropTypes from "prop-types";
 import React from "react";
-import ParagraphAction from "../ParagraphAction";
-
+import DataTable from 'react-data-table-component';
+import {
+	CButton,
+} from '@coreui/react'
 function ParagraphTable(props) {
-	const {
-		setInitialValue,
-		setIsModalVisible,
-		paragraphs,
-		part,
-		examId,
-		setIsDetailViewMode,
-	} = props;
+	const { setIsModalVisible, questions, setInitialValue } = props;
+	const columns = [
+		{
+			name: 'STT',
+			selector: row => row.number,
+			cell: (row, index, column, id) => {
+				return <>{row?.number}</>
+			}
+		},
+		{
+			name: 'Hình ảnh',
+			selector: row => row?.image,
+			cell: (row, index, column, id) => {
+				return <>{row?.image}</>
+			}
+		},
+		{
+			name: 'Đoạn văn',
+			selector: row => row.content,
+			cell: (row, index, column, id) => {
+				return <>{row?.content}</>
+			}
+		},
+		{
+			name: '',
+			button: true,
+			allowOverflow: true,
+			ignoreRowClick: true,
+			cell: (row, index, column, id) => (
+				<CButton
+					color={"primary"}
+					key={1}
+
+					onClick={() => {
+						setInitialValue(row)
+						setIsModalVisible(true)
+					}}
+				>
+					{"Sửa"}
+				</CButton>
+			)
+		}
+	];
 
 	return (
-		<Table
-			dataSource={paragraphs}
-			pagination={false}
-			scroll={{ y: 420 }}
-			style={{ height: "490px" }}
-		>
-			<Column
-				align="center"
-				width="60px"
-				title="STT"
-				key="stt"
-				render={(_, __, index) => <>{index + 1}</>}
-			/>
-			<Column
-				title="Đoạn văn"
-				dataIndex="paragraph"
-				key="paragraph"
-				render={(_, record, index) => {
-					const paragraph = record.paragraph;
-					const isAudio = paragraph?.startsWith("http");
-					return paragraph?.length > 0 ? (
-						isAudio ? (
-							<audio controls>
-								<source src={paragraph} />
-							</audio>
-						) : (
-							<>{`Đoạn ${index + 1}`}</>
-						)
-					) : (
-						""
-					);
-				}}
-			/>
-			<Column
-				title="Hình ảnh"
-				dataIndex="image"
-				key="image"
-				align="center"
-				render={(_, record) => (
-					<Image
-						width={120}
-						src={record.image} // ? record.image : imageNotFound
-						height={80}
-						// fallback={imageNotFound}
-						style={{ objectFit: "cover", backgroundPosition: "center center" }}
-					/>
-				)}
-			/>
-			<Column
-				key="action"
-				align="center"
-				render={(_, record, index) => {
-					return (
-						<ParagraphAction
-							paragraph={record}
-							setInitialValue={setInitialValue}
-							setIsModalVisible={setIsModalVisible}
-							part={part}
-							examId={examId}
-							setIsDetailViewMode={setIsDetailViewMode}
-						/>
-					);
-				}}
-			/>
-		</Table>
+		<DataTable
+			title={props.title || ""}
+			columns={columns}
+			data={questions}
+			pagination={true}
+		/>
 	);
 }
 
 ParagraphTable.propTypes = {
-	paragraphs: PropTypes.array,
+	questions: PropTypes.array,
 	setInitialValue: PropTypes.func,
 	setIsModalVisible: PropTypes.func,
 	setIsDetailViewMode: PropTypes.func,
-	part: PropTypes.number,
-	examId: PropTypes.number,
 };
 
 ParagraphTable.defaultProps = {
-	paragraphs: [],
+	questions: [],
 	setInitialValue: null,
 	setIsModalVisible: null,
 	setIsDetailViewMode: null,
-	part: 3,
-	examId: 0,
 };
 
 export default ParagraphTable;

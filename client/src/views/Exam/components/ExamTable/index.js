@@ -38,7 +38,7 @@ function ExamTable(props) {
 	];
 	return (
 		<DataTable
-		title="Quản lý bài học"
+		
 		columns={columns}
 		data={exams}
 		onChangePage={(p) => handlePageChange(p)}

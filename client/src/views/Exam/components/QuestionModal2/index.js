@@ -19,11 +19,10 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import questionApi from "src/api/questionApi"
 function QuestionModal(props) {
-	const { isModalVisible, setIsModalVisible, initialValue } = props;
+	const { isModalVisible, setIsModalVisible, initialValue, setInitialValue } = props;
 
 	const query = useQuery();
-	const examId = query.get("examId");
-	const part = +query.get("part");
+	const questionId = query.get("questionId");
 
 	const dispatch = useDispatch();
 
@@ -32,36 +31,20 @@ function QuestionModal(props) {
 	};
 
 	const handleSubmit = async (values) => {
-		const { id, content, audio = "" } = values;
 		let question = { ...values };
-		console.log("question: ", initialValue)
-		if (part === 1) {
-			question = { ...values};
-		}
 
-		if (part === 1 || part === 2) delete question.audio;
-
-		const response = await questionApi.update(id, question);
-
+		const response = await questionApi.updateQuestion(questionId, question);
+		console.log({ response })
 		if (response.error) {
 			const error = response.error;
 			for (const property in error) {
 				message.error(error[property]);
 			}
 		} else {
-			if (part === 1) {
-				if (content && typeof content === "object")
-					await questionApi.updateImage(id, content);
-			}
-			if (part === 1 || part === 2) {
-				if (audio && typeof audio === "object")
-					await questionApi.updateAudio(id, audio);
-			}
-
 			message.success("Cập nhật thành công");
 			handleCancel();
 		}
-		dispatch(fetchQuestions({ examId, type: part }));
+		// dispatch(fetchQuestions({ examId, type: part }));
 	};
 
 	return (
@@ -71,7 +54,7 @@ function QuestionModal(props) {
 			</CModalHeader>
 			<CModalBody>
 				<Formik
-					 initialValues={initialValue}
+					initialValues={initialValue}
 					validationSchema={questionValues.validationSchema}
 					onSubmit={handleSubmit}
 					enableReinitialize
@@ -86,17 +69,15 @@ function QuestionModal(props) {
 									style={{ width: "100%" }}
 								>
 									<FastField component={InputField} name="_id" type="hidden" />
-									{part > 1 && (
-										<FastField
-											name="question"
-											component={InputField}
-											title="Câu hỏi"
-											titleCol={6}
-											maxLength={200}
-											inputCol={18}
-											isRequire={true}
-										/>
-									)}
+									<FastField
+										name="question"
+										component={InputField}
+										title="Câu hỏi"
+										titleCol={6}
+										maxLength={200}
+										inputCol={18}
+										isRequire={true}
+									/>
 
 									<FastField
 										name="A"
@@ -135,7 +116,7 @@ function QuestionModal(props) {
 										isRequire={true}
 									/>
 									<FastField
-										name="correct"
+										name="corectanswer"
 										component={InputField}
 										title="Đáp án"
 										titleCol={6}
@@ -143,37 +124,14 @@ function QuestionModal(props) {
 										inputCol={18}
 										isRequire={true}
 									/>
-									{/* {part > 1 (<FastField
+									<FastField
 										name="transcript"
 										component={InputField}
 										title="Giải thích"
 										titleCol={6}
 										maxLength={200}
 										inputCol={18}
-									/>)} */}
-
-									{[1, 2, 3, 4].includes(part) && (
-										<FastField
-											name="audio"
-											component={UploadField}
-											title="Audio"
-											titleCol={6}
-											inputCol={18}
-											fileType="audio/*"
-										/>
-									)}
-
-									{[1, 3, 4].includes(part) && (
-										<FastField
-											name="content"
-											component={ImageField}
-											title="Hình ảnh"
-											titleCol={6}
-											maxLength={200}
-											inputCol={18}
-											isRequire={true}
-										/>
-									)}
+									/>
 								</Space>
 							</Form>
 						);

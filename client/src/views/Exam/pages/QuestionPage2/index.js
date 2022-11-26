@@ -2,7 +2,7 @@ import { Divider } from "antd";
 import Title from "antd/lib/typography/Title";
 import Page404 from 'src/views/pages/page404/Page404';
 import QuestionDetailModal from "src/views/Exam/components/QuestionDetailModal";
-import QuestionModal from "src/views/Exam/components/QuestionModal";
+import QuestionModal from "src/views/Exam/components/QuestionModal2";
 import QuestionTable from "src/views/Exam/components/QuestionTable2";
 import { fetchQuestionDetail } from "src/stores/exam/examSlice";
 import { useQuery } from "src/views/Exam/hooks";
@@ -29,8 +29,6 @@ function QuestionDetailPage(props) {
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [initialValue, setInitialValue] = useState(questionValues.initial);
 
-
-
 	useEffect(() => {	
 		dispatch(fetchQuestionDetail(questionId)); 
 	}, []);
@@ -39,33 +37,17 @@ function QuestionDetailPage(props) {
 		<div>
 			<CRow>
 				<CCol xs={12}>
-					<Divider orientation="left">
-						<Title level={3}>{`Question ${question?.group?.from}-${question?.group?.to}`}</Title>
-					</Divider>
-					<CButton
-						color={"primary"}
-
-						onClick={() => setIsModalVisible(true)}
-					>
-						{"Thêm"}
-					</CButton>
-
-				</CCol>
-				<CCol xs={12}>
 					<CCard className="mb-4">
-						<CCardHeader>
-
-						</CCardHeader>
 						<CCardBody>
 							<QuestionTable
 								questions={
-									 question.questions || []
+									 question?.questions || []
 								}
+								title = {`Question ${question.group.from}-${question.group.to}`}
 								part={question?.type}
 								setInitialValue={setInitialValue}
 								setIsModalVisible={setIsModalVisible}
 							/>
-
 							{isModalVisible && (
 								<QuestionModal
 									// title={`Part ${query.get("part")}`}
@@ -74,14 +56,6 @@ function QuestionDetailPage(props) {
 									initialValue={initialValue}
 								/>
 							)}
-
-							{/* {isDetailViewMode && (
-								<QuestionDetailModal
-									isDetailViewMode={isDetailViewMode}
-									setIsDetailViewMode={setIsDetailViewMode}
-									question={initialValue}
-								/>
-							)} */}
 						</CCardBody>
 					</CCard>
 
