@@ -7,6 +7,7 @@ var vocaCategory = require('./routes/vocabulary.route');
 var examCategory_routes = require('./routes/vocaCategory.route');
 var exam_routes = require('./routes/exam.route');
 var question_routes = require('./routes/question.route');
+var upload_routes = require('./routes/upload.route');
 const routes = (app) => {
     app.use('/api/auth', auth_routes);
     app.use('/api/users', users_routes);
@@ -17,5 +18,6 @@ const routes = (app) => {
     app.use('/api/exams/categories', examCategory_routes);
     app.use('/api/exams', exam_routes);
     app.use('/api/questions', question_routes);
+    app.use('/api/upload', upload_routes);
 }
 module.exports = routes

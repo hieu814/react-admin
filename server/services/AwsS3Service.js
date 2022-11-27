@@ -16,7 +16,7 @@ const s3 = new S3({
 const FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE);
 class AwsS3Service {
 
-    async uploadFile(multerFile,collectionID,folder = 'files') {
+    async uploadFile(multerFile,collectionID,folder = '') {
         if(!multerFile){
             throw Error("File không hợp lệ")
         }
@@ -28,7 +28,7 @@ class AwsS3Service {
         const uploadParams = {
             Bucket: BucketName,
             Body: fileBuffer,
-            Key: `${folder}/${collectionID}_${multerFile.originalname}`,
+            Key: `files${folder}/${collectionID}_${multerFile.originalname}`,
         };
         uploadParams.ContentType = multerFile.mimetype;
 

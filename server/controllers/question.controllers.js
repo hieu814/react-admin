@@ -1,9 +1,9 @@
 const QuestionService = require('../services/Question.service')
 exports.getAll = async (req, res, next) => {
     try {
-        const examID = req.query.examID 
-        const part = req.query.part 
-        const data = await QuestionService.getQuestion(examID,part)
+        const examID = req.query.examID
+        const part = req.query.part
+        const data = await QuestionService.getQuestion(examID, part)
         res.status(200).send({
             data: data
         });
@@ -22,6 +22,17 @@ exports.getOne = async (req, res, next) => {
     }
 
 }
+exports.updateGroupQuestion = async (req, res, next) => {
+    const id = req.params.id;
+    console.log({ fileeeee: req.file })
+    QuestionService.updateGroupQuestion(id, req.body).then(data => {
+        console.log({ data });
+        res.status(200).send(data);
+    }).catch(err => {
+        next(err)
+    })
+
+}
 exports.update = async (req, res, next) => {
     const id = req.params.id;
     const updateObject = req.body;
@@ -37,7 +48,7 @@ exports.delete = async (req, res, next) => {
     const id = req.params.id; //examID
     const examID = req.params.examID; //examID
     try {
-        const data = await QuestionService.delete(examID,id)
+        const data = await QuestionService.delete(examID, id)
         res.status(200).send(data);
     } catch (err) {
         next(err)
@@ -55,7 +66,7 @@ exports.updateImage = async (req, res, next) => {
     const id = req.params.id;
     try {
         const file = req.file
-        const updateObject = await QuestionService.updateImage(id,file)
+        const updateObject = await QuestionService.updateImage(id, file)
         res.status(200).json({
             success: true,
             message: 'updated',
@@ -70,7 +81,7 @@ exports.updateAudio = async (req, res, next) => {
     const id = req.params.id;
     try {
         const file = req.file
-        const updateObject = await QuestionService.updateAudio(id,file)
+        const updateObject = await QuestionService.updateAudio(id, file)
         res.status(200).json({
             success: true,
             message: 'updated',
@@ -83,7 +94,7 @@ exports.updateAudio = async (req, res, next) => {
 exports.addGroup = async (req, res, next) => {
     try {
         const examID = req.params.examID;
-        const data = await QuestionService.addGroup(req.body,examID)
+        const data = await QuestionService.addGroup(req.body, examID)
         res.status(200).send(data);
     } catch (err) {
         next(err)

@@ -1,9 +1,9 @@
 const { applicationDefault } = require('firebase-admin/app');
 const admin = require('firebase-admin');
 
-// const serviceAccount = require(GOOGLE_APPLICATION_CREDENTIALS);
+const serviceAccount = require('../firebase-admin.json');
 admin.initializeApp({
-    credential: applicationDefault(),
+    credential: admin.credential.cert(serviceAccount)
     // databaseURL: 'https://<DATABASE_NAME>.firebaseio.com'
 });
 function vertifyAccessToken(idToken) {
@@ -14,11 +14,11 @@ function vertifyAccessToken(idToken) {
                 resolve({ user: userRecord })
             }).catch(error => {
                 console.error('Error while getting Firebase User record:', error);
-                resolve({ user: null })
+                reject({ user: null })
             });
         }).catch(error => {
             console.error('Error while verifying Firebase ID token:', error);
-            resolve({ user: null })
+            reject({ user: null })
         });
     })
     return promise

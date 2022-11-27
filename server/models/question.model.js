@@ -8,7 +8,7 @@ const questionSchema = new mongoose.Schema(
         B: { type: String, trim: true, default: "" },
         C: { type: String, trim: true, default: "" },
         D: { type: String, trim: true, default: "" },
-        correct: { type: String, trim: true, default: "" }
+        correctanswer: { type: String, trim: true, default: "" }
     }
 )
 module.exports = mongoose.model('question', questionSchema)

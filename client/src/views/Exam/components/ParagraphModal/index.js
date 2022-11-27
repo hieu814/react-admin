@@ -9,8 +9,8 @@ import {
 	CModalTitle,
 
 } from '@coreui/react'
-import { ImageField, InputField, UploadField } from "src/views/components/customfield";
-import { fetchQuestions } from "src/stores/exam/examSlice";
+import { ImageField, InputField, TextAreaField } from "src/views/components/customfield";
+import { fetchQuestionDetail } from "src/stores/exam/examSlice";
 import { useQuery } from "src/views/Exam/hooks";
 import { questionValues } from "src/views/Exam/initialAndValidateValues";
 import { FastField, Form, Formik } from "formik";
@@ -18,6 +18,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { useDispatch } from "react-redux";
 import questionApi from "src/api/questionApi"
+import upload from "src/api/uploadAPI"
 function ParagraphModal(props) {
 	const { isModalVisible, setIsModalVisible, initialValue, setInitialValue } = props;
 
@@ -32,9 +33,16 @@ function ParagraphModal(props) {
 
 	const handleSubmit = async (values) => {
 		let passage = { ...values };
+		if (passage.image && passage.image != initialValue.image) {
+			const res = await upload.updateImage(passage.image)
+			passage.image = res.url
+			console.log("upload new file ", res.url);
+		} else {
+			passage.image = initialValue.image
+		}
+		// upload.updateImage
+		const response = await questionApi.updateGroupQuestion(questionId, { passage: passage });
 
-		const response = await questionApi.updateQuestion(questionId, { passage: passage });
-		console.log({ response })
 		if (response.error) {
 			const error = response.error;
 			for (const property in error) {
@@ -44,6 +52,7 @@ function ParagraphModal(props) {
 			message.success("Cập nhật thành công");
 			handleCancel();
 		}
+		dispatch(fetchQuestionDetail(questionId));
 		// dispatch(fetchQuestions({ examId, type: part }));
 	};
 
@@ -70,7 +79,7 @@ function ParagraphModal(props) {
 									<FastField component={InputField} name="_id" type="hidden" />
 									<FastField
 										name="content"
-										component={InputField}
+										component={TextAreaField}
 										title="Đoạn Văn"
 										titleCol={6}
 										maxLength={200}

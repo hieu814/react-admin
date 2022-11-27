@@ -75,6 +75,16 @@ class QuestionService {
             throw Error("Thiếu thông tin")
         }
     }
+    async updateGroupQuestion(questionId, body) {
+        console.log("updateGroupQuestion", { body });
+        if (body?.question)
+            return questionModel.updateOne({ "_id": questionId, "questions._id": body?.question._id }, { "$set": { "questions.$": body?.question } })
+        else if (body?.passage) {
+            delete body.image
+            return questionModel.updateOne({ "_id": questionId, "passages._id": body?.passage._id }, { "$set": { "passages.$": body?.passage } })
+        }
+
+    }
     async addGroup(obj, examID) {
         let _question = obj
         delete _question['_id'];

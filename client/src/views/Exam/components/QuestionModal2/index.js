@@ -10,7 +10,7 @@ import {
 
 } from '@coreui/react'
 import { ImageField, InputField, UploadField } from "src/views/components/customfield";
-import { fetchQuestions } from "src/stores/exam/examSlice";
+import { fetchQuestionDetail } from "src/stores/exam/examSlice";
 import { useQuery } from "src/views/Exam/hooks";
 import { questionValues } from "src/views/Exam/initialAndValidateValues";
 import { FastField, Form, Formik } from "formik";
@@ -32,9 +32,9 @@ function QuestionModal(props) {
 
 	const handleSubmit = async (values) => {
 		let question = { ...values };
+		console.log({ question })
+		const response = await questionApi.updateGroupQuestion(questionId, { question: question });
 
-		const response = await questionApi.updateQuestion(questionId, question);
-		console.log({ response })
 		if (response.error) {
 			const error = response.error;
 			for (const property in error) {
@@ -44,7 +44,7 @@ function QuestionModal(props) {
 			message.success("Cập nhật thành công");
 			handleCancel();
 		}
-		// dispatch(fetchQuestions({ examId, type: part }));
+		dispatch(fetchQuestionDetail(questionId));
 	};
 
 	return (
@@ -116,21 +116,13 @@ function QuestionModal(props) {
 										isRequire={true}
 									/>
 									<FastField
-										name="corectanswer"
+										name="correctanswer"
 										component={InputField}
 										title="Đáp án"
 										titleCol={6}
 										maxLength={200}
 										inputCol={18}
 										isRequire={true}
-									/>
-									<FastField
-										name="transcript"
-										component={InputField}
-										title="Giải thích"
-										titleCol={6}
-										maxLength={200}
-										inputCol={18}
 									/>
 								</Space>
 							</Form>

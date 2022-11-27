@@ -43,7 +43,7 @@ function QuestionDetailPage(props) {
 								questions={
 									 question?.questions || []
 								}
-								title = {`Question ${question.group.from}-${question.group.to}`}
+								title = {`Question ${question.group?.from}-${question.group?.to}`}
 								part={question?.type}
 								setInitialValue={setInitialValue}
 								setIsModalVisible={setIsModalVisible}

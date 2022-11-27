@@ -2,6 +2,8 @@
 import PropTypes from "prop-types";
 import React from "react";
 import DataTable from 'react-data-table-component';
+import { Image } from "antd";
+import imageNotFound from "src/assets/images/image-not-found.svg";
 import {
 	CButton,
 } from '@coreui/react'
@@ -17,9 +19,20 @@ function ParagraphTable(props) {
 		},
 		{
 			name: 'Hình ảnh',
-			selector: row => row?.image,
+			selector: row => row.image,
 			cell: (row, index, column, id) => {
-				return <>{row?.image}</>
+				return (
+					<Image
+						width={120}
+						src={row.image}
+						height={80}
+						fallback={imageNotFound}
+						style={{
+							objectFit: "cover",
+							backgroundPosition: "center center",
+						}}
+					/>
+				);
 			}
 		},
 		{

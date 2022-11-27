@@ -26,7 +26,7 @@ const questionApi = {
 		return axiosClient.patch(url, Data);
 	},
 	updateGroupQuestion: (id, Data) => {
-		const url = `${BASE_URL}/${id}`;
+		const url = `${BASE_URL}/updateGroupQuestion/${id}`;
 		return axiosClient.patch(url, Data);
 	},
 	updateQuestion: (id, Data) => {
